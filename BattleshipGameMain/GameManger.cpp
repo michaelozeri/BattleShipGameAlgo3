@@ -1,14 +1,14 @@
 #include "GameManager.h"
-#include "IFileDirectoryUtils.h"
-#include "Contants.h"
-#include "GameBoardUtils.h"
+#include "../Common/IFileDirectoryUtils.h"
+#include "../Common/Contants.h"
+#include "../Common/GameBoardUtils.h"
 #include "ShipDetailsBoard.h"
 
 GameManager::GameManager(Configuration& config): config(config)
 {
 }
 
-bool GameManager::ConfigureDll() 
+bool GameManager::ConfigureDlls() 
 {
 	vector<string> collection;
 	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", collection);
@@ -27,6 +27,9 @@ bool GameManager::ConfigureDll()
 	return true;
 }
 
+/*
+check if path inserted or not and if ok
+ */
 bool GameManager::ConfigurePath() const
 {
 	if(!config.path.empty())
@@ -42,6 +45,7 @@ bool GameManager::ConfigurePath() const
 		cout << "Wrong Path: " << config.path << endl;
 		return false;
 	}
+
 	MainLogger.logFile << "Path is not specified in the argument, getting current working directory" << endl;
 	config.path = IFileDirectoryUtils::GetCurrentWorkingDirectory();
 	
@@ -54,10 +58,10 @@ bool GameManager::ConfigurePath() const
 	return false;
 }
 
-bool GameManager::ConfigureBoard()
+bool GameManager::ConfigureBoards()
 {
-	vector<string> collection;
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.sboard", collection);
+	vector<string> boradPathsCollection;
+	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.sboard", boradPathsCollection);
 	if(cnt <= 0)
 	{
 		MainLogger.logFile << "Missing *.sboard file" << endl;
@@ -65,7 +69,8 @@ bool GameManager::ConfigureBoard()
 		return false;
 	}
 	
-	string boardPath = collection[0];
+	//TODO: change this here
+	string boardPath = boradPathsCollection[0];
 	MainLogger.logFile << "Board path in use is " << boardPath << endl;
 
 	mainGameBoard = GameBoardUtils::InitializeNewEmptyBoard(ROWS,COLS);
@@ -83,8 +88,8 @@ bool GameManager::ConfigureBoard()
 
 bool GameManager::ConfigureFiles()
 {
-	bool res1 = ConfigureBoard();
-	bool res2 = ConfigureDll();
+	bool res1 = ConfigureBoards();
+	bool res2 = ConfigureDlls();
 
 	return res1 && res2;
 }
@@ -125,7 +130,7 @@ bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) 
 
 int GameManager::GameInitializer()
 {
-	bool result = ConfigurePath();
+	bool result = ConfigurePath(); 
 	if (!result)
 	{
 		return ErrorExitCode;
@@ -341,9 +346,9 @@ int GameManager::RunGame()
 	{
 		return code;
 	}
+
 	MainLogger.logFile << "===== Game Initilized =======" << endl;
 
-	
 	code = PlayGame();
 	
 	MainLogger.logFile << "Game exit code is " << code << endl;

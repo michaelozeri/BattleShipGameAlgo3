@@ -137,7 +137,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);ALGO_EXPORTS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DllAlgo.h" />
+    <ClInclude Include="GameBoard.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="IArgumentParser.h" />
     <ClInclude Include="IBattleshipGameAlgo.h" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="ArgumentParser.cpp" />
     <ClCompile Include="DllAlgo.cpp" />
+    <ClCompile Include="GameBoard.cpp" />
     <ClCompile Include="GameManger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShipDetailsBoard.cpp" />

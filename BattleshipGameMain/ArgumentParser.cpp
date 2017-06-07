@@ -1,4 +1,6 @@
 #include "IArgumentParser.h"
+#include <vector>
+using namespace std;
 
 void IArgumentParser::ParseArguments(Configuration& config, int argc, char* argv[])
 {
@@ -6,21 +8,17 @@ void IArgumentParser::ParseArguments(Configuration& config, int argc, char* argv
 	{
 		for (int i = 1; i < argc; i++)
 		{
-			string s = argv[i];
-			if (!s.compare("-quiet")) 
-			{
-				config.bonusParam.isQuiet = true;
+			string currentArgumnet = argv[i];
+			if (currentArgumnet.substr(0,8).compare("-threads")) {
+				config.numberOfThreads = atoi(currentArgumnet.substr(9, currentArgumnet.size - 9).c_str());
 			}
-			else if (!s.compare("-delay"))
-			{
-				int del = atoi(argv[i + 1]);
-				config.bonusParam.delayInMiliseconds = del;
-				i++;
-			}
-			else
-			{
-				config.path = argv[i];
+			else {
+				config.path = currentArgumnet;
 			}
 		}
+	}
+	else {
+		//TODO: check if needed to put in path null or not
+		//number of threads is 4
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "IBattleshipGameAlgo.h"
-#include "IOLib.h"
+#include "../Common/IOLib.h"
 #include "Windows.h"
 
 using namespace std;

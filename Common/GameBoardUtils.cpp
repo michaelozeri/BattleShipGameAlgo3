@@ -123,7 +123,7 @@ bool CheckShipSize(char** board, char direction, int i, int j, char type, int ro
 /*
 * this function validates the game board and prints by order the errors in the game
 */
-BoardFileErrorCode GameBoardUtils::ValidateGameBoard(char** board, int rows, int cols)
+BoardFileErrorCode GameBoardUtils::ValidateGameBoard(char*** board)
 { 
 	int playerAboatNum = 0; // Holds valid boat num from player A
 	int playerBboatNum = 0; // Holds valid boat num from player B
@@ -268,7 +268,7 @@ void GameBoardUtils::InitBoard(char** board, int rows, int cols, char InitChar =
 	}
 }
 
-bool GameBoardUtils::IsPlayerIdChar(int playerID, char current, bool CopyAllChars = false){
+bool GameBoardUtils::IsPlayerIdChar(int playerID, char current){
 	if (playerID == PlayerAID)
 	{
 		return current == RubberBoatA ||
@@ -316,7 +316,7 @@ void GameBoardUtils::LoadLineToBoard(char** board, int row, int cols, const stri
 
 char** GameBoardUtils::InitializeNewEmptyBoard(int rows, int cols)
 {
-	char** board = new char*[rows];
+	char*** board = new char*[rows];
 	for (int i = 0; i < rows; ++i)
 	{
 		board[i] = new char[cols];
@@ -333,7 +333,7 @@ void GameBoardUtils::DeleteBoard(char** board, int rows) {
 }
 
 
-BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int cols, const string& filePath) 
+BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char*** board, const string& filePath) 
 {
 	//set all board to blank
 	InitBoard(board, rows, cols);

@@ -10,7 +10,7 @@ using namespace std;
 * a utility class for performing static functions at main function
 */
 class GameBoardUtils {
-	static BoardFileErrorCode ValidateGameBoard(char** board, int rows, int cols);
+	static BoardFileErrorCode ValidateGameBoard(char*** board);
 public:
 	static void InitBoard(char** board, int rows, int cols, char InitChar);
 	static bool IsPlayerIdChar(int playerID, char current);
@@ -19,7 +19,7 @@ public:
 	static void LoadLineToBoard(char** board, int row, int cols, const string& cs);
 	static char** InitializeNewEmptyBoard(int rows, int cols);
 	static void DeleteBoard(char** board, int rows);
-	static BoardFileErrorCode LoadBoardFromFile(char** board, int rows, int cols, const string& filePath);
+	static BoardFileErrorCode LoadBoardFromFile(char*** board, const string& filePath);
 	static void PrintBoard(ostream& stream, char** board, int rows, int cols);
 	static void CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols);
 	static void CloneBoard(char** full_board, char** player_board, int rows, int cols);

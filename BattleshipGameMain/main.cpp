@@ -1,8 +1,8 @@
-#include "GameBoardUtils.h"
-#include "Bonus.h"
+#include "../Common/GameBoardUtils.h"
+#include "../Common/Bonus.h"
 #include <vector>
 #include "IBattleshipGameAlgo.h"
-#include "IFileDirectoryUtils.h"
+#include "../Common/IFileDirectoryUtils.h"
 #include "IArgumentParser.h"
 #include "GameManager.h"
 
@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 {
 	Configuration config;
 	IArgumentParser::ParseArguments(config, argc, argv);
-	GameManager game(config);
+	GameManager game(config); //only sets config field
 
 	int exitCode = game.RunGame();
 	return exitCode;

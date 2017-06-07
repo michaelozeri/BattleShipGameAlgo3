@@ -1,11 +1,12 @@
 #pragma once
-#include "Bonus.h"
+#include "../Common/Bonus.h"
 
 using namespace std;
 class Configuration
 {
 public:
 	string path;
+	int numberOfThreads = 4;
 	BonusParams bonusParam;
 };
 

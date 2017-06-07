@@ -45,6 +45,10 @@ bool IFileDirectoryUtils::DirExists(const std::string& dirName_in)
 	return false;    // this is not a directory!
 }
 
+/*
+inserts into collection all the paths of .sboard files inside the folder
+and returns number of files found
+*/
 int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& filePattern, vector<string>& collection)
 {
 	int counter = 0;
@@ -76,6 +80,7 @@ int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& fileP
 	
 	FindClose(handle);
 
+	//lexicographically sort all paths TODO: check if needed to sort
 	sort(collection.begin(), collection.end());
 	return counter;
 }
