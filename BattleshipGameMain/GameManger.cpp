@@ -4,21 +4,34 @@
 #include "../Common/GameBoardUtils.h"
 #include "ShipDetailsBoard.h"
 
-GameManager::GameManager(Configuration& config): config(config)
-{
-}
+GameManager::GameManager(Configuration& config): config(config){}
 
 bool GameManager::ConfigureDlls() 
 {
-	vector<string> Dllcollection;
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", Dllcollection);
+	vector<string> DllPathcollection;
+	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", DllPathcollection);
 	if (cnt < 2)
 	{
 		MainLogger.logFile << "Missing *.dll file. Found " << cnt << endl;
 		cout << "Missing an algorithm (dll) file looking in path: " << config.path << endl;
 		return false;
 	}
-	
+
+	for each (string dllPath in DllPathcollection)
+	{
+		MainLogger.logFile << "DLl path in use is " << dllPath << endl;
+		//load dll from file path
+		DllAlgo dllAlgo;
+		if (!dllAlgo.LoadDll(dllPath)) {
+			//TODO: what to do in here in case of err
+		}
+		
+		MainLogger.logFile << "dll was loaded successfuly" << endl;
+
+		//add the gameboard to the vector gameboards
+		m_algoArray.push_back(dllAlgo);
+	}
+		
 	MainLogger.logFile << "Loaded: " << cnt << " Dll's from path: " << config.path << endl;
 	return true;
 }
@@ -68,14 +81,13 @@ bool GameManager::ConfigureBoards()
 	{
 		MainLogger.logFile << "Board path in use is " << boardPath << endl;
 
-		//declare on board
-		GameBoard gameBoard;
+		//load main game board from file
+		GameBoard gameBoard = GameBoardUtils::CreateGameBoardFromFile(boardPath);
 
-		//load main game board from file & validate the board
-		if (GameBoardUtils::LoadBoardFromFile(gameBoard, boardPath) != BoardFileErrorCode::Success)
-		{
-			MainLogger.logFile << "Failed to validate successfuly board" << endl;
-			return false;
+		//validate Game Board
+		BoardFileErrorCode errcode = GameBoardUtils::ValidateGameBoard(gameBoard); //TODO: mordi enhence
+		if (errcode != BoardFileErrorCode::Success) {
+			//TODO: check error code if ok and how to exit
 		}
 
 		MainLogger.logFile << "Board was validated successfuly" << endl;
@@ -91,15 +103,12 @@ bool GameManager::ConfigureFiles()
 {
 	bool res1 = ConfigureBoards();
 	bool res2 = ConfigureDlls();
-
 	return res1 && res2;
 }
 
-bool GameManager::InitPlayers()
-{
-	return InitDllAlgo(algo1, m_dllPaths.first, PlayerAID) && InitDllAlgo(algo2, m_dllPaths.second, PlayerBID);
-}
-
+/*
+from previous HW TODO: check if needed
+*/
 bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) const
 {
 	bool result  = algo.LoadDll(path);
@@ -143,28 +152,27 @@ int GameManager::GameInitializer()
 		return ErrorExitCode;
 	}
 
-	result = InitPlayers();
+	result = InitializeTaskQueue();
 	if (!result)
 	{
 		return ErrorExitCode;
 	}
-
 	return 0;
 }
 
-pair<int, int> GameManager::GetNextPlayerAttack(int player_id, IBattleshipGameAlgo*  player_a, IBattleshipGameAlgo* player_b)
+Coordinate GameManager::GetNextPlayerAttack(int player_id, IBattleshipGameAlgo*  player_a, IBattleshipGameAlgo* player_b)
 {
 	if (player_id == PlayerAID)
 	{
 		return player_a->attack();
 	}
-	if (player_id == PlayerBID)
+	else
 	{
 		return player_b->attack();
 	}
 	// Fatal Error
 	MainLogger.logFile << "Fatal error occured. Attack move was asked for non exixting player id " << player_id << endl;
-	return{ };
+	return ;
 }
 
 
@@ -230,8 +238,8 @@ int GameManager::PlayGame() const
 	// While not both of players ended their attacks
 	while (!AattacksDone || !BattacksDone)
 	{
-		pair<int, int> tempPair = GetNextPlayerAttack(playerIdToPlayNext, algo1.algo, algo2.algo); 
-		if (tempPair.first == AttckDoneIndex && (tempPair.second == AttckDoneIndex))
+		Coordinate tempCoordinate = GetNextPlayerAttack(playerIdToPlayNext, algo1.algo, algo2.algo); 
+		if (tempCoordinate.first == AttckDoneIndex && (tempCoordinate.second == AttckDoneIndex))
 		{
 			switch (playerIdToPlayNext)
 			{
@@ -247,16 +255,16 @@ int GameManager::PlayGame() const
 			// Flip players
 			playerIdToPlayNext = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
 		}
-		else if (ValidAttackCor(tempPair))
+		else if (ValidAttackCor(tempCoordinate))
 		{
 			//aligned both axis -1 because main board starts from (0,0)
-			tempPair = { tempPair.first - 1,tempPair.second - 1 };
+			tempCoordinate = { tempCoordinate.first - 1,tempCoordinate.second - 1 };
 
-			char attckCell = mainGameBoard[tempPair.first][tempPair.second];
+			char attckCell = mainGameBoard[tempCoordinate.first][tempCoordinate.second];
 			bool isSelfAttack = GameBoardUtils::IsPlayerIdChar(playerIdToPlayNext, attckCell);
 
 			//calculate attack and update mainboard
-			AttackResult tempattackresult = GetAttackResult(tempPair, mainGameBoard, playerAboardDetails, playerBboardDetails);
+			AttackResult tempattackresult = GetAttackResult(tempCoordinate, mainGameBoard, playerAboardDetails, playerBboardDetails);
 
 			string resultDesc;
 			switch (tempattackresult)
@@ -267,11 +275,11 @@ int GameManager::PlayGame() const
 			default: ;
 			}
 
-			MainLogger.logFile << "Player " << playerIdToPlayNext << " attack in (" << tempPair.first << "," << tempPair.second << ") result: " << resultDesc << endl;
+			MainLogger.logFile << "Player " << playerIdToPlayNext << " attack in (" << tempCoordinate.first << "," << tempCoordinate.second << ") result: " << resultDesc << endl;
 
 			//update players - Notify with values 1-10 and not 0-9
-			algo1.algo->notifyOnAttackResult(playerIdToPlayNext, tempPair.first + 1, tempPair.second + 1, tempattackresult);
-			algo2.algo->notifyOnAttackResult(playerIdToPlayNext, tempPair.first + 1, tempPair.second + 1, tempattackresult);
+			algo1.algo->notifyOnAttackResult(playerIdToPlayNext, tempCoordinate.first + 1, tempCoordinate.second + 1, tempattackresult);
+			algo2.algo->notifyOnAttackResult(playerIdToPlayNext, tempCoordinate.first + 1, tempCoordinate.second + 1, tempattackresult);
 
 			if (tempattackresult != AttackResult::Miss)
 			{
@@ -288,10 +296,10 @@ int GameManager::PlayGame() const
 				if (tempattackresult == AttackResult::Sink)
 				{
 					// In case sink update all the cell to SINK_CHAR
-					PrintSinkCharRec(mainGameBoard, bonus, tempPair.first, tempPair.second, playerTosetColor);
+					PrintSinkCharRec(mainGameBoard, bonus, tempCoordinate.first, tempCoordinate.second, playerTosetColor);
 				}
 				else // In case hit update only the target cell
-					bonus.PrintPlayerChar(mainGameBoard[tempPair.first][tempPair.second], tempPair.second, tempPair.first, playerTosetColor);
+					bonus.PrintPlayerChar(mainGameBoard[tempCoordinate.first][tempCoordinate.second], tempCoordinate.second, tempCoordinate.first, playerTosetColor);
 			}
 
 			if (tempattackresult == AttackResult::Miss || isSelfAttack)
@@ -317,7 +325,7 @@ int GameManager::PlayGame() const
 		}
 		else
 		{
-			MainLogger.logFile << "Invlaid attack <" << tempPair.first << "," << tempPair.second
+			MainLogger.logFile << "Invlaid attack <" << tempCoordinate.row << "," << tempCoordinate.col << ","
 								<< "> for player " << playerIdToPlayNext << ". Flipping players" << endl;
 			// Flip players
 			playerIdToPlayNext = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
@@ -376,8 +384,11 @@ void GameManager::Test_GetAllAttacks() const
 	}
 }
 
-GameBoard* GameManager::InitializeGameBoardArray(int size) {
-	return new GameBoard[size];
+bool GameManager::InitializeTaskQueue() {
+
+	//TODO: finish this
+
+	return true;
 }
 
 #pragma endregion 

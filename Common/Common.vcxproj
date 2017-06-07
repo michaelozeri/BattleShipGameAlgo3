@@ -137,6 +137,7 @@
     <ClInclude Include="Bonus.h" />
     <ClInclude Include="Contants.h" />
     <ClInclude Include="GameBoardUtils.h" />
+    <ClInclude Include="GameTask.h" />
     <ClInclude Include="IBattleshipGameAlgo.h" />
     <ClInclude Include="IFileDirectoryUtils.h" />
     <ClInclude Include="IOLib.h" />
@@ -145,6 +146,7 @@
     <ClCompile Include="Bonus.cpp" />
     <ClCompile Include="FileDirectoryUtils.cpp" />
     <ClCompile Include="GameBoardUtils.cpp" />
+    <ClCompile Include="GameTask.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

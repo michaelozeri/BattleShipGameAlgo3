@@ -1,9 +1,5 @@
 #include "GameBoard.h"
 
-GameBoard::GameBoard(char*** board): m_gameboard(board)
-{
-}
-
 GameBoard::~GameBoard()
 {
 	for (int i = 0; i < GameBoard::rows(); i++)
@@ -24,7 +20,9 @@ char GameBoard::charAt(Coordinate c) const {
 	return ' ';
 }
 
-GameBoard::GameBoard() {
-
+GameBoard::GameBoard(char*** board, int rows, int cols, int depth): m_gameboard(board){
+	_rows = rows;
+	_cols = cols;
+	_depth = depth;
 }
 

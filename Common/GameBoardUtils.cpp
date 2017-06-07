@@ -3,6 +3,9 @@
 #include "Contants.h"
 #include <thread>
 #include <Windows.h>
+#include <vector>
+#include <sstream>
+
 
 void GetWrongSizeErrMessage(char type, int player)
 {
@@ -123,8 +126,9 @@ bool CheckShipSize(char** board, char direction, int i, int j, char type, int ro
 /*
 * this function validates the game board and prints by order the errors in the game
 */
-BoardFileErrorCode GameBoardUtils::ValidateGameBoard(char*** board)
+BoardFileErrorCode GameBoardUtils::ValidateGameBoard(const GameBoard& gameBoard) //TODO: mordi finish
 { 
+	/*
 	int playerAboatNum = 0; // Holds valid boat num from player A
 	int playerBboatNum = 0; // Holds valid boat num from player B
 	
@@ -255,17 +259,31 @@ BoardFileErrorCode GameBoardUtils::ValidateGameBoard(char*** board)
 	bool isNotLegalBoard = shapeB || shapeP || shapeM || shapeD || shapeb || shapep || shapem || shaped
 		|| adjacentErr || playerAboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER || playerBboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER;
 	return isNotLegalBoard ? BoardFileErrorCode::UnknownError : BoardFileErrorCode::Success;
+	*/
 }
 
-void GameBoardUtils::InitBoard(char** board, int rows, int cols, char InitChar = BLANK)
+char*** GameBoardUtils::InitBoard(int rows, int cols,int depth, char InitChar = BLANK)
 {
+	char*** board;
+	for (int i = 0; i < rows; ++i)
+	{
+		for (size_t j = 0; j < cols; j++)
+		{
+			board[i][j] = new char[depth];
+		}
+	}
+
 	for (size_t i = 0; i < rows; i++)
 	{
 		for (size_t j = 0; j < cols; j++)
 		{
-			board[i][j] = InitChar;
+			for (size_t k = 0; k < depth; k++)
+			{
+				board[i][j][k] = InitChar;
+			}
 		}
 	}
+	return board;
 }
 
 bool GameBoardUtils::IsPlayerIdChar(int playerID, char current){
@@ -314,16 +332,6 @@ void GameBoardUtils::LoadLineToBoard(char** board, int row, int cols, const stri
 	}
 }
 
-char** GameBoardUtils::InitializeNewEmptyBoard(int rows, int cols)
-{
-	char*** board = new char*[rows];
-	for (int i = 0; i < rows; ++i)
-	{
-		board[i] = new char[cols];
-	}
-	return board;
-}
-
 void GameBoardUtils::DeleteBoard(char** board, int rows) {
 	// Delete board array
 	for (int i = 0; i < rows; ++i) {
@@ -333,51 +341,57 @@ void GameBoardUtils::DeleteBoard(char** board, int rows) {
 }
 
 
-BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(GameBoard& board, const string& filePath) 
+GameBoard GameBoardUtils::CreateGameBoardFromFile(const string& filePath) 
 {
-	//set all board to blank
-	InitBoard(board, rows, cols);
-
+	int rows, cols, depth;
+	string line;
+	//parse text file and get rows, cols, depth
 	FileReader fileReader(filePath);
+	fileReader.ReadLine(line);
+	vector<string> sizeVector = splitLineByDelimiter(line, 'x');
+	cols = stoi(sizeVector[0]);
+	rows = stoi(sizeVector[1]);
+	depth = stoi(sizeVector[2]);
 
-	int row = 0;
-	while (!fileReader.IsEof() && row < rows)
-	{
-		string line;
-		fileReader.ReadLine(line);
-		LoadLineToBoard(board, row, cols, line);
-		row++;
+	//initialize board
+	char*** board = GameBoardUtils::InitBoard(rows, cols, depth);
+
+	//fill board with data
+	if (fillBoardData(board, fileReader, rows, cols, depth) != BoardFileErrorCode::Success) {
+		//TODO: exit without exit(0);
 	}
+	
+	//initialize GameBoard
+	GameBoard gameBoard(board, rows, cols, depth);
 
 	fileReader.CloseFile();
-	
-	// Clone current board, becaue ValidateGameBoard changed the board
-	char** cloneBoard = GameBoardUtils::InitializeNewEmptyBoard(rows,cols);
-	GameBoardUtils::CloneBoard(board, cloneBoard,rows,cols);
-	BoardFileErrorCode errcode = ValidateGameBoard(cloneBoard, rows, cols);
-
-	// Delete clone board
-	DeleteBoard(cloneBoard,rows);
-
-	return errcode;
+	return gameBoard;
 }
 
 
 
-void GameBoardUtils::PrintBoard(ostream& stream, GameBoard& board) 
+void GameBoardUtils::PrintBoard(ostream& stream, GameBoard& gameBoard) 
 {
-	//TODO: fix this
-	for (int i = 0; i < rows; i++)
+	stream << "****** printing gameBoard *******" << endl;
+	for (int k = 0; k < gameBoard.depth; k++)
 	{
-		for (int j = 0; j < cols; j++)
+		stream << endl;
+		for (int i = 0; i < gameBoard.rows; i++)
 		{
-			stream << board[i][j];
+			for (int j = 0; j < gameBoard.cols; j++)
+			{
+				stream << gameBoard.m_gameboard[i][j][k];
+			}
+			stream << endl;
 		}
 		stream << endl;
 	}
 }
 
-void GameBoardUtils::CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols,bool CopyAllChars = false) {
+void GameBoardUtils::CloneBoardToPlayer(const char** full_board,
+	int playerID, char** player_board, int rows, int cols,
+	bool CopyAllChars = false) {
+
 	InitBoard(player_board, rows, cols);
 
 	for (size_t i = 0; i < rows; i++)
@@ -576,6 +590,44 @@ void GameBoardUtils::InitLogger(Logger& logger,string logpath)
 {
 	logger.InitLogger(logpath);
 }
+
+/*
+this function splits the line into tokens to a vector and returns the vector
+*/
+vector<string> GameBoardUtils::splitLineByDelimiter(string& line, char delimiter)
+{
+	vector<string> result;
+	stringstream  data(line);
+	string line;
+	while (getline(data, line, delimiter))
+	{
+		result.push_back(line);
+	}
+	return result;
+}
+
+/*
+this function fills the board with the board file path given
+*/
+BoardFileErrorCode GameBoardUtils::fillBoardData(char*** board, FileReader& fileReader,int rows,int cols,int depth) //TODO: check errors while reading file
+{
+	string tempLine;
+	fileReader.ReadLine(tempLine);
+	for (int k = 0; k < depth; k++)
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			fileReader.ReadLine(tempLine);
+			for (int j = 0; j < cols; j++)
+			{
+				board[i][j][k] = tempLine.at(j);
+			}
+		}
+		fileReader.ReadLine(tempLine);
+	}
+	return BoardFileErrorCode::Success;
+}
+
 
 
 
