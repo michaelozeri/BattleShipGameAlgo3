@@ -2,7 +2,6 @@
 
 GameBoard::GameBoard(char*** board): m_gameboard(board)
 {
-
 }
 
 GameBoard::~GameBoard()
@@ -24,3 +23,8 @@ char GameBoard::charAt(Coordinate c) const {
 	}
 	return ' ';
 }
+
+GameBoard::GameBoard() {
+
+}
+

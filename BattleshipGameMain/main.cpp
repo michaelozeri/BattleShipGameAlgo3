@@ -15,7 +15,6 @@ int main(int argc, char* argv[])
 	Configuration config;
 	IArgumentParser::ParseArguments(config, argc, argv);
 	GameManager game(config); //only sets config field
-
 	int exitCode = game.RunGame();
 	return exitCode;
 }

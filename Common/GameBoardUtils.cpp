@@ -333,7 +333,7 @@ void GameBoardUtils::DeleteBoard(char** board, int rows) {
 }
 
 
-BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char*** board, const string& filePath) 
+BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(GameBoard& board, const string& filePath) 
 {
 	//set all board to blank
 	InitBoard(board, rows, cols);
@@ -364,8 +364,9 @@ BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char*** board, const string
 
 
 
-void GameBoardUtils::PrintBoard(ostream& stream, char** board, int rows, int cols) 
+void GameBoardUtils::PrintBoard(ostream& stream, GameBoard& board) 
 {
+	//TODO: fix this
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)

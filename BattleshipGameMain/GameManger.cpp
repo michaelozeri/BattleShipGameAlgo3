@@ -10,20 +10,16 @@ GameManager::GameManager(Configuration& config): config(config)
 
 bool GameManager::ConfigureDlls() 
 {
-	vector<string> collection;
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", collection);
+	vector<string> Dllcollection;
+	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", Dllcollection);
 	if (cnt < 2)
 	{
 		MainLogger.logFile << "Missing *.dll file. Found " << cnt << endl;
 		cout << "Missing an algorithm (dll) file looking in path: " << config.path << endl;
 		return false;
 	}
-
-	dllPaths.first = collection[0];
-	dllPaths.second = collection[1];
-
-	MainLogger.logFile << "First Algo path: " << dllPaths.first << endl;
-	MainLogger.logFile << "Second Algo path: " << dllPaths.second << endl;
+	
+	MainLogger.logFile << "Loaded: " << cnt << " Dll's from path: " << config.path << endl;
 	return true;
 }
 
@@ -60,29 +56,34 @@ bool GameManager::ConfigurePath() const
 
 bool GameManager::ConfigureBoards()
 {
-	vector<string> boradPathsCollection;
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.sboard", boradPathsCollection);
+	vector<string> boardPathsCollection;
+	int cnt = IFileDirectoryUtils::GetAllFiles(config.path,"*.sboard", boardPathsCollection);
 	if(cnt <= 0)
 	{
 		MainLogger.logFile << "Missing *.sboard file" << endl;
 		cout << "Missing board file (*.sboard) looking in path: " << config.path << endl;
 		return false;
 	}
-	
-	//TODO: change this here
-	string boardPath = boradPathsCollection[0];
-	MainLogger.logFile << "Board path in use is " << boardPath << endl;
-
-	mainGameBoard = GameBoardUtils::InitializeNewEmptyBoard(ROWS,COLS);
-	//load main game board from file & validate the board
-	if (GameBoardUtils::LoadBoardFromFile(mainGameBoard, ROWS, COLS, boardPath) != BoardFileErrorCode::Success)
+	for each (string boardPath in boardPathsCollection)
 	{
-		MainLogger.logFile << "Failed to validate successfuly board" << endl;
-		return false;
-	}
+		MainLogger.logFile << "Board path in use is " << boardPath << endl;
 
-	MainLogger.logFile << "Board was validated successfuly" << endl;
-	GameBoardUtils::PrintBoard(MainLogger.logFile, mainGameBoard, ROWS, COLS);
+		//declare on board
+		GameBoard gameBoard;
+
+		//load main game board from file & validate the board
+		if (GameBoardUtils::LoadBoardFromFile(gameBoard, boardPath) != BoardFileErrorCode::Success)
+		{
+			MainLogger.logFile << "Failed to validate successfuly board" << endl;
+			return false;
+		}
+
+		MainLogger.logFile << "Board was validated successfuly" << endl;
+		GameBoardUtils::PrintBoard(MainLogger.logFile, gameBoard);
+
+		//add the gameboard to the vector gameboards
+		m_boardArray.push_back(gameBoard);
+	}
 	return true;
 }
 
@@ -96,7 +97,7 @@ bool GameManager::ConfigureFiles()
 
 bool GameManager::InitPlayers()
 {
-	return InitDllAlgo(algo1, dllPaths.first, PlayerAID) && InitDllAlgo(algo2, dllPaths.second, PlayerBID);
+	return InitDllAlgo(algo1, m_dllPaths.first, PlayerAID) && InitDllAlgo(algo2, m_dllPaths.second, PlayerBID);
 }
 
 bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) const
@@ -339,16 +340,21 @@ void GameManager::GameManagerCleanup() const
 
 int GameManager::RunGame()
 {
+	//initialize logger
 	GameBoardUtils::InitLogger(MainLogger, "GameManager.log");
 
+	//initialize and validate all boards , dll algo and queue of games
 	int code = GameInitializer();
 	if(code == ErrorExitCode)
 	{
 		return code;
 	}
-
 	MainLogger.logFile << "===== Game Initilized =======" << endl;
 
+	//This is a must print for the home assignment
+	cout << "Number of legal players: " << m_algoArray.size;
+	cout << "Number of legal boards: " << m_boardArray.size;
+	//start running the game
 	code = PlayGame();
 	
 	MainLogger.logFile << "Game exit code is " << code << endl;
@@ -368,6 +374,10 @@ void GameManager::Test_GetAllAttacks() const
 		MainLogger.logFile << attack.first << "," << attack.second << endl;
 		attack = algo1.algo->attack();
 	}
+}
+
+GameBoard* GameManager::InitializeGameBoardArray(int size) {
+	return new GameBoard[size];
 }
 
 #pragma endregion 

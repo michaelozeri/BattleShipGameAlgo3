@@ -9,9 +9,7 @@ extern Logger MainLogger;
 class GameManager
 {
 	Configuration& config;
-	pair<string, string> dllPaths;
-	DllAlgo* algoArray; //TODO: make this an array
-	GameBoard m_boardArray[];
+	pair<string, string> m_dllPaths;
 	
 	bool ConfigureDlls();
 	bool ConfigurePath() const;
@@ -27,12 +25,14 @@ class GameManager
 	static void PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player);
 	static bool IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
 	static bool ValidAttackCor(const pair<int, int>& pair);
+	static GameBoard* InitializeGameBoardArray(int size);
 	int PlayGame() const;
 
 	void GameManagerCleanup() const;
 public:
+	vector<DllAlgo> m_algoArray;
+	vector<GameBoard> m_boardArray;
 	GameManager(Configuration& config);
-
 	int RunGame();
 	void Test_GetAllAttacks() const;
 };

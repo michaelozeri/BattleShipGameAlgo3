@@ -46,7 +46,7 @@ bool IFileDirectoryUtils::DirExists(const std::string& dirName_in)
 }
 
 /*
-inserts into collection all the paths of .sboard files inside the folder
+inserts into 'collection' all the paths of 'filePattern' files inside the folder
 and returns number of files found
 */
 int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& filePattern, vector<string>& collection)

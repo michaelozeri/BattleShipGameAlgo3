@@ -3,6 +3,7 @@
 #include "Contants.h"
 #include <thread>
 #include "IOLib.h"
+#include "../BattleshipGameMain/GameBoard.h"
 
 using namespace std;
 
@@ -19,8 +20,8 @@ public:
 	static void LoadLineToBoard(char** board, int row, int cols, const string& cs);
 	static char** InitializeNewEmptyBoard(int rows, int cols);
 	static void DeleteBoard(char** board, int rows);
-	static BoardFileErrorCode LoadBoardFromFile(char*** board, const string& filePath);
-	static void PrintBoard(ostream& stream, char** board, int rows, int cols);
+	static BoardFileErrorCode LoadBoardFromFile(GameBoard& board, const string& filePath);
+	static void PrintBoard(ostream& stream, GameBoard& board);
 	static void CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols);
 	static void CloneBoard(char** full_board, char** player_board, int rows, int cols);
 	static void MarkCannotAttack(char** markBoard, int playernum, const char** mainBoard, int rows, int cols );
