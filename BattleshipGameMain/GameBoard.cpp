@@ -11,6 +11,18 @@ GameBoard::~GameBoard()
 	}
 }
 
+void GameBoard::dispose()
+{
+	for (size_t i = 0; i < rows(); i++)
+	{
+		for (size_t j = 0; j < cols(); j++)
+		{
+			delete m_gameboard[i][j];
+		}
+	}
+	delete m_gameboard;
+}
+
 char GameBoard::charAt(Coordinate c) const {
 	char charAtPosition = m_gameboard[c.row][c.col][c.depth];
 	bool isMyChar = GameBoardUtils::IsPlayerIdChar(_playerNum, charAtPosition);

@@ -119,14 +119,14 @@ bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) 
 	}
 
 	// Set Player Board
-	char** playerboard = GameBoardUtils::ClonePlayerBoard(const_cast<const char**>(mainGameBoard), playerID,ROWS,COLS);
-	algo.algo->setBoard(playerID, const_cast<const char**>(playerboard), ROWS, COLS);
-	GameBoardUtils::DeleteBoard(playerboard, ROWS);
+	//char** playerboard = GameBoardUtils::ClonePlayerBoard(const_cast<const char**>(mainGameBoard), playerID,ROWS,COLS);
+	//algo.algo->setBoard(playerID, const_cast<const char**>(playerboard), ROWS, COLS);
+	//GameBoardUtils::DeleteBoardArray(playerboard, ROWS);
 
 	MainLogger.logFile << "Set board for player " << playerID << " finished" << endl;
 
 	// Init
-	result = algo.algo->init(config.path);
+	//result = algo.algo->init(config.path);
 	if(!result)
 	{
 		MainLogger.logFile << "Failed to init for player " << playerID << endl;
@@ -221,14 +221,14 @@ bool GameManager::ValidAttackCor(const pair<int, int>& pair)
 
 int GameManager::PlayGame() const
 {
-	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
-	ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
+	//ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
+	//ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
 
 	int playerIdToPlayNext = PlayerAID;
 
 	// Configure Bonus start point and color
 	Bonus bonus(!config.bonusParam.isQuiet, config.bonusParam.delayInMiliseconds);
-	bonus.Init(mainGameBoard, ROWS, COLS);
+	//bonus.Init(mainGameBoard, ROWS, COLS);
 	GameBoardUtils::ChangeFontSize();
 
 	//main game play
@@ -339,9 +339,14 @@ int GameManager::PlayGame() const
 
 void GameManager::GameManagerCleanup() const
 {
-	GameBoardUtils::DeleteBoard(mainGameBoard, ROWS);
-	algo1.Dispose();
-	algo2.Dispose();
+	GameBoardUtils::DeleteBoardArray(m_boardArray);
+	for each (DllAlgo algo in m_algoArray)
+	{
+		algo.Dispose();
+	}
+	for each(GameBoard gameBoard in m_boardArray) {
+		gameBoard.dispose();
+	}
 
 	MainLogger.LoggerDispose();
 }
@@ -371,10 +376,30 @@ int GameManager::RunGame()
 	return code;
 }
 
+/*
+this function fills the task queue in such an order that
+each round (= m_algoArray.size = #players / 2) will have all the players playing in it on some board.
+*/
+bool GameManager::InitializeTaskQueue() {
+
+	for each (GameBoard gameBoard in m_boardArray)
+	{
+		for (size_t i = 1; i < m_algoArray.size; i++)
+		{
+			for (size_t j = 0; j < m_algoArray.size; j++)
+			{
+				GameTask task(j, (j + i) % m_algoArray.size, gameBoard);
+				m_taskList.push(task);
+			}
+		}
+	}
+	return true;
+}
+
 
 #pragma region Test
 
-void GameManager::Test_GetAllAttacks() const
+/*void GameManager::Test_GetAllAttacks() const
 {
 	pair<int, int> attack = algo1.algo->attack();
 	while (attack.first != AttckDoneIndex)
@@ -382,13 +407,9 @@ void GameManager::Test_GetAllAttacks() const
 		MainLogger.logFile << attack.first << "," << attack.second << endl;
 		attack = algo1.algo->attack();
 	}
-}
+}*/
 
-bool GameManager::InitializeTaskQueue() {
 
-	//TODO: finish this
 
-	return true;
-}
 
 #pragma endregion 

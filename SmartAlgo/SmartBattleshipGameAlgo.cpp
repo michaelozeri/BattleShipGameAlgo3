@@ -321,8 +321,8 @@ void SmartBattleshipGameAlgo::notifyOnAttackResult(int player, int row, int col,
 
 SmartBattleshipGameAlgo::~SmartBattleshipGameAlgo()
 {
-	GameBoardUtils::DeleteBoard(m_board,m_NumRow);
-	GameBoardUtils::DeleteBoard(m_cannotAttackBoard,m_NumRow);
+	GameBoardUtils::DeleteBoardArray(m_board,m_NumRow);
+	GameBoardUtils::DeleteBoardArray(m_cannotAttackBoard,m_NumRow);
 	MainLogger.LoggerDispose();
 }
 

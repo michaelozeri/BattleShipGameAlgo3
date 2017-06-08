@@ -17,7 +17,7 @@ public:
 	static int GetCharPlayerId(char current);
 	static bool IsLegalBoradChar(char current);
 	static void LoadLineToBoard(char** board, int row, int cols, const string& cs);
-	static void DeleteBoard(char** board, int rows);
+	static void DeleteBoardArray(vector<GameBoard> m_boardArray);
 	static GameBoard CreateGameBoardFromFile(const string& filePath);
 	static void PrintBoard(ostream& stream, GameBoard& board);
 	static void CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols);

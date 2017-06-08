@@ -1,6 +1,6 @@
 #include "GameTask.h"
 
-GameTask::GameTask(DllAlgo & playerA, DllAlgo & playerB, GameBoard & gameBoard): m_playerA(playerA),m_playerB(playerB),m_gameBoard(gameBoard){}
+GameTask::GameTask(int playerAIndex, int playerBIndex, GameBoard& gameBoard): m_playerAIndex(playerAIndex), m_playerBIndex(playerBIndex),m_gameBoard(gameBoard){}
 
 GameTask::~GameTask()
 {

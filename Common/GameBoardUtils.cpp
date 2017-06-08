@@ -332,13 +332,7 @@ void GameBoardUtils::LoadLineToBoard(char** board, int row, int cols, const stri
 	}
 }
 
-void GameBoardUtils::DeleteBoard(char** board, int rows) {
-	// Delete board array
-	for (int i = 0; i < rows; ++i) {
-		delete[] board[i];
-	}
-	delete[] board;
-}
+
 
 
 GameBoard GameBoardUtils::CreateGameBoardFromFile(const string& filePath) 
@@ -388,39 +382,7 @@ void GameBoardUtils::PrintBoard(ostream& stream, GameBoard& gameBoard)
 	}
 }
 
-void GameBoardUtils::CloneBoardToPlayer(const char** full_board,
-	int playerID, char** player_board, int rows, int cols,
-	bool CopyAllChars = false) {
 
-	InitBoard(player_board, rows, cols);
-
-	for (size_t i = 0; i < rows; i++)
-	{
-		for (size_t j = 0; j < cols; j++)
-		{
-			if(playerID == 0)
-			{
-				player_board[i][j] = IsPlayerIdChar(playerID, full_board[i][j]) ? full_board[i][j] : player_board[i][j]
-			}else
-			{
-				
-			}
-
-		}
-	}
-}
-
-void GameBoardUtils::CloneBoard(char** full_board, char** player_board, int rows, int cols) {
-	InitBoard(player_board, rows, cols);
-
-	for (size_t i = 0; i < rows; i++)
-	{
-		for (size_t j = 0; j < cols; j++)
-		{
-			player_board[i][j] = full_board[i][j];
-		}
-	}
-}
 
 void GameBoardUtils::MarkCannotAttack(char** markBoard, int playernum, const char** mainBoard, int rows, int cols)
 {
@@ -550,12 +512,7 @@ bool GameBoardUtils::DirExists(const std::string& dirName_in)
 	return false;    // this is not a directory!
 }
 
-char** GameBoardUtils::ClonePlayerBoard(const char** fullBoard, int i, int rows, int cols)
-{
-	char** playerBoard = GameBoardUtils::InitializeNewEmptyBoard(rows,cols);
-	GameBoardUtils::CloneBoardToPlayer(fullBoard, i, playerBoard,rows,cols);
-	return playerBoard;
-}
+
 
 void GameBoardUtils::ChangeFontSize()
 {
@@ -627,6 +584,61 @@ BoardFileErrorCode GameBoardUtils::fillBoardData(char*** board, FileReader& file
 	}
 	return BoardFileErrorCode::Success;
 }
+
+#pragma region fix_func
+
+char** GameBoardUtils::ClonePlayerBoard(const char** fullBoard, int i, int rows, int cols)
+{
+	char** playerBoard = GameBoardUtils::InitializeNewEmptyBoard(rows, cols);
+	GameBoardUtils::CloneBoardToPlayer(fullBoard, i, playerBoard, rows, cols);
+	return playerBoard;
+}
+
+void GameBoardUtils::CloneBoardToPlayer(const char** full_board,
+	int playerID, char** player_board, int rows, int cols,
+	bool CopyAllChars = false) {
+
+	InitBoard(player_board, rows, cols);
+
+	for (size_t i = 0; i < rows; i++)
+	{
+		for (size_t j = 0; j < cols; j++)
+		{
+			if (playerID == 0)
+			{
+				player_board[i][j] = IsPlayerIdChar(playerID, full_board[i][j]) ? full_board[i][j] : player_board[i][j]
+			}
+			else
+			{
+
+			}
+
+		}
+	}
+}
+
+void GameBoardUtils::CloneBoard(char** full_board, char** player_board, int rows, int cols) {
+	InitBoard(player_board, rows, cols);
+
+	for (size_t i = 0; i < rows; i++)
+	{
+		for (size_t j = 0; j < cols; j++)
+		{
+			player_board[i][j] = full_board[i][j];
+		}
+	}
+}
+
+
+void GameBoardUtils::DeleteBoardArray(vector<GameBoard> m_boardArray) {
+	// Delete board array
+	for (int i = 0; i < rows; ++i) {
+		delete[] board[i];
+	}
+	delete[] board;
+}
+
+#pragma endregion
 
 
 

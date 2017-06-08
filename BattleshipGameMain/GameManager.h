@@ -39,5 +39,5 @@ public:
 	queue<GameTask> m_taskList;
 	GameManager(Configuration& config);
 	int RunGame();
-	void Test_GetAllAttacks() const;
+	//void Test_GetAllAttacks() const;
 };

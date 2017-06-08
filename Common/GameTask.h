@@ -5,9 +5,9 @@
 
 class GameTask {
 public:
-	DllAlgo m_playerA, m_playerB;
+	int m_playerAIndex, m_playerBIndex;
 	GameBoard m_gameBoard;
-	GameTask(DllAlgo& playerA,DllAlgo& playerB,GameBoard& gameBoard);
+	GameTask(int playerAIndex,int playerBIndex,GameBoard& gameBoard);
 	~GameTask();
 	void playGame();
 };
