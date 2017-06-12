@@ -4,7 +4,7 @@
 class BoardValidator
 {
 public:
-	static bool ValidateBoard(const Board3D&  boardToValidate)
+	static bool ValidateBoard(Board3D  boardToValidate)
 	{
 		return true;
 	}
