@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C983632F-CC3D-4D5F-8F99-7B5A726C4D0A}</ProjectGuid>
-    <RootNamespace>Common</RootNamespace>
+    <ProjectGuid>{D0A91ADB-5107-42FD-BC2C-3C102C34AF0B}</ProjectGuid>
+    <RootNamespace>DummyAlgo</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -44,7 +44,7 @@
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetExt>.lib</TargetExt>
+    <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,7 +105,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;COMMON_EXPORTS;%(PreprocessorDefinitions);ALGO_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);ALGO_EXPORTS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -113,17 +113,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bonus.cpp" />
-    <ClCompile Include="FileDirectoryUtils.cpp" />
-    <ClCompile Include="GameBoardUtils.cpp" />
+    <ClInclude Include="DummyAlgo.h" />
+    <ClInclude Include="IBattleshipGameAlgo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bonus.h" />
-    <ClInclude Include="Contants.h" />
-    <ClInclude Include="GameBoardUtils.h" />
-    <ClInclude Include="IBattleshipGameAlgo.h" />
-    <ClInclude Include="IFileDirectoryUtils.h" />
-    <ClInclude Include="IOLib.h" />
+    <ClCompile Include="DummyAlgo.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

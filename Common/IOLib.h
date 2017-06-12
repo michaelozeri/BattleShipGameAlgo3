@@ -10,15 +10,22 @@ class FileReader
 {
 	string filePath;
 	ifstream fin;
+	bool isOpen;
 public:
-	FileReader(const std::string& path) :filePath(path)
+	FileReader(const std::string& path) : filePath(path), isOpen(false)
 	{
 		fin.open(path);
+		isOpen = true;
 	}
+
 	string& ReadLine(string& line)
 	{
-		getline(fin, line);
-		line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+		if (!IsEof())
+		{
+			getline(fin, line);
+			line.erase(remove(line.begin(), line.end(), '\r'), line.end());
+			return line;
+		}
 		return line;
 	}
 
@@ -39,6 +46,13 @@ public:
 	void CloseFile()
 	{
 		fin.close();
+		isOpen = false;
+	}
+
+	~FileReader ()
+	{
+		if (isOpen)
+			CloseFile();
 	}
 };
 

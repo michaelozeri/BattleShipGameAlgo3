@@ -4,8 +4,6 @@
 #include <thread>
 #include <Windows.h>
 #include <vector>
-#include <sstream>
-
 
 void GetWrongSizeErrMessage(char type, int player)
 {
@@ -126,9 +124,8 @@ bool CheckShipSize(char** board, char direction, int i, int j, char type, int ro
 /*
 * this function validates the game board and prints by order the errors in the game
 */
-BoardFileErrorCode GameBoardUtils::ValidateGameBoard(const GameBoard& gameBoard) //TODO: mordi finish
+BoardFileErrorCode GameBoardUtils::ValidateGameBoard(char** board, int rows, int cols)
 { 
-	/*
 	int playerAboatNum = 0; // Holds valid boat num from player A
 	int playerBboatNum = 0; // Holds valid boat num from player B
 	
@@ -259,34 +256,31 @@ BoardFileErrorCode GameBoardUtils::ValidateGameBoard(const GameBoard& gameBoard)
 	bool isNotLegalBoard = shapeB || shapeP || shapeM || shapeD || shapeb || shapep || shapem || shaped
 		|| adjacentErr || playerAboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER || playerBboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER;
 	return isNotLegalBoard ? BoardFileErrorCode::UnknownError : BoardFileErrorCode::Success;
-	*/
 }
 
-char*** GameBoardUtils::InitBoard(int rows, int cols,int depth, char InitChar = BLANK)
+void GameBoardUtils::InitBoard(char** board, int rows, int cols, char InitChar = BLANK)
 {
-	char*** board;
-	for (int i = 0; i < rows; ++i)
-	{
-		for (size_t j = 0; j < cols; j++)
-		{
-			board[i][j] = new char[depth];
-		}
-	}
-
 	for (size_t i = 0; i < rows; i++)
 	{
 		for (size_t j = 0; j < cols; j++)
 		{
-			for (size_t k = 0; k < depth; k++)
-			{
-				board[i][j][k] = InitChar;
-			}
+			board[i][j] = InitChar;
 		}
 	}
-	return board;
 }
 
-bool GameBoardUtils::IsPlayerIdChar(int playerID, char current){
+bool GameBoardUtils::IsPlayerIdChar(int playerID, char current, bool CopyAllChars){
+	if(CopyAllChars)
+	{
+		return current == RubberBoatA ||
+			current == RocketShipA ||
+			current == SubmarineA ||
+			current == DestroyerA ||
+			current == RubberBoatB ||
+			current == RocketShipB ||
+			current == SubmarineB ||
+			current == DestroyerB;
+	}
 	if (playerID == PlayerAID)
 	{
 		return current == RubberBoatA ||
@@ -332,57 +326,102 @@ void GameBoardUtils::LoadLineToBoard(char** board, int row, int cols, const stri
 	}
 }
 
-
-
-
-GameBoard GameBoardUtils::CreateGameBoardFromFile(const string& filePath) 
+void GameBoardUtils::LoadLineToBoard(vector<vector<vector<char>>>& borad3D, int row, int depth, int numOfcols, const string& cs)
 {
-	int rows, cols, depth;
-	string line;
-	//parse text file and get rows, cols, depth
-	FileReader fileReader(filePath);
-	fileReader.ReadLine(line);
-	vector<string> sizeVector = splitLineByDelimiter(line, 'x');
-	cols = stoi(sizeVector[0]);
-	rows = stoi(sizeVector[1]);
-	depth = stoi(sizeVector[2]);
-
-	//initialize board
-	char*** board = GameBoardUtils::InitBoard(rows, cols, depth);
-
-	//fill board with data
-	if (fillBoardData(board, fileReader, rows, cols, depth) != BoardFileErrorCode::Success) {
-		//TODO: exit without exit(0);
+	int lenght_int = static_cast<int>(cs.length());
+	int len = lenght_int < numOfcols ? lenght_int : numOfcols;
+	for (int i = 0; i < len; i++)
+	{
+		char currentChar = cs[i];
+		borad3D[row][i][depth] = IsLegalBoradChar(currentChar) ? currentChar : BLANK;
 	}
-	
-	//initialize GameBoard
-	GameBoard gameBoard(board, rows, cols, depth);
+}
+
+char** GameBoardUtils::InitializeNewEmptyBoard(int rows, int cols)
+{
+	char** board = new char*[rows];
+	for (int i = 0; i < rows; ++i)
+	{
+		board[i] = new char[cols];
+	}
+	return board;
+}
+
+void GameBoardUtils::DeleteBoard(char** board, int rows) {
+	// Delete board array
+	for (int i = 0; i < rows; ++i) {
+		delete[] board[i];
+	}
+	delete[] board;
+}
+
+
+BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int cols, const string& filePath) 
+{
+	//set all board to blank
+	InitBoard(board, rows, cols);
+
+	FileReader fileReader(filePath);
+
+	int row = 0;
+	while (!fileReader.IsEof() && row < rows)
+	{
+		string line;
+		fileReader.ReadLine(line);
+		LoadLineToBoard(board, row, cols, line);
+		row++;
+	}
 
 	fileReader.CloseFile();
-	return gameBoard;
+	
+	// Clone current board, becaue ValidateGameBoard changed the board
+	char** cloneBoard = GameBoardUtils::InitializeNewEmptyBoard(rows,cols);
+	GameBoardUtils::CloneBoard(board, cloneBoard,rows,cols);
+	BoardFileErrorCode errcode = ValidateGameBoard(cloneBoard, rows, cols);
+
+	// Delete clone board
+	DeleteBoard(cloneBoard,rows);
+
+	return errcode;
 }
 
 
 
-void GameBoardUtils::PrintBoard(ostream& stream, GameBoard& gameBoard) 
+void GameBoardUtils::PrintBoard(ostream& stream, char** board, int rows, int cols) 
 {
-	stream << "****** printing gameBoard *******" << endl;
-	for (int k = 0; k < gameBoard.depth; k++)
+	for (int i = 0; i < rows; i++)
 	{
-		stream << endl;
-		for (int i = 0; i < gameBoard.rows; i++)
+		for (int j = 0; j < cols; j++)
 		{
-			for (int j = 0; j < gameBoard.cols; j++)
-			{
-				stream << gameBoard.m_gameboard[i][j][k];
-			}
-			stream << endl;
+			stream << board[i][j];
 		}
 		stream << endl;
 	}
 }
 
+void GameBoardUtils::CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols,bool CopyAllChars) {
+	InitBoard(player_board, rows, cols);
 
+	for (size_t i = 0; i < rows; i++)
+	{
+		for (size_t j = 0; j < cols; j++)
+		{
+			player_board[i][j] = IsPlayerIdChar(playerID, full_board[i][j]) ? full_board[i][j] : player_board[i][j];
+		}
+	}
+}
+
+void GameBoardUtils::CloneBoard(char** full_board, char** player_board, int rows, int cols) {
+	InitBoard(player_board, rows, cols);
+
+	for (size_t i = 0; i < rows; i++)
+	{
+		for (size_t j = 0; j < cols; j++)
+		{
+			player_board[i][j] = full_board[i][j];
+		}
+	}
+}
 
 void GameBoardUtils::MarkCannotAttack(char** markBoard, int playernum, const char** mainBoard, int rows, int cols)
 {
@@ -512,7 +551,12 @@ bool GameBoardUtils::DirExists(const std::string& dirName_in)
 	return false;    // this is not a directory!
 }
 
-
+char** GameBoardUtils::ClonePlayerBoard(const char** fullBoard, int i, int rows, int cols)
+{
+	char** playerBoard = GameBoardUtils::InitializeNewEmptyBoard(rows,cols);
+	GameBoardUtils::CloneBoardToPlayer(fullBoard, i, playerBoard,rows,cols);
+	return playerBoard;
+}
 
 void GameBoardUtils::ChangeFontSize()
 {
@@ -522,7 +566,7 @@ void GameBoardUtils::ChangeFontSize()
 
 	if (GetCurrentConsoleFontEx(hStdout, FALSE, &orig))
 	{
-		//AppLogger.logFile << "Got\n"; //TODO: restore all instances here of applogger
+		//AppLogger.logFile << "Got\n"; 
 	}
 	else
 	{
@@ -547,99 +591,6 @@ void GameBoardUtils::InitLogger(Logger& logger,string logpath)
 {
 	logger.InitLogger(logpath);
 }
-
-/*
-this function splits the line into tokens to a vector and returns the vector
-*/
-vector<string> GameBoardUtils::splitLineByDelimiter(string& line, char delimiter)
-{
-	vector<string> result;
-	stringstream  data(line);
-	string line;
-	while (getline(data, line, delimiter))
-	{
-		result.push_back(line);
-	}
-	return result;
-}
-
-/*
-this function fills the board with the board file path given
-*/
-BoardFileErrorCode GameBoardUtils::fillBoardData(char*** board, FileReader& fileReader,int rows,int cols,int depth) //TODO: check errors while reading file
-{
-	string tempLine;
-	fileReader.ReadLine(tempLine);
-	for (int k = 0; k < depth; k++)
-	{
-		for (int i = 0; i < rows; i++)
-		{
-			fileReader.ReadLine(tempLine);
-			for (int j = 0; j < cols; j++)
-			{
-				board[i][j][k] = tempLine.at(j);
-			}
-		}
-		fileReader.ReadLine(tempLine);
-	}
-	return BoardFileErrorCode::Success;
-}
-
-#pragma region fix_func
-
-char** GameBoardUtils::ClonePlayerBoard(const char** fullBoard, int i, int rows, int cols)
-{
-	char** playerBoard = GameBoardUtils::InitializeNewEmptyBoard(rows, cols);
-	GameBoardUtils::CloneBoardToPlayer(fullBoard, i, playerBoard, rows, cols);
-	return playerBoard;
-}
-
-void GameBoardUtils::CloneBoardToPlayer(const char** full_board,
-	int playerID, char** player_board, int rows, int cols,
-	bool CopyAllChars = false) {
-
-	InitBoard(player_board, rows, cols);
-
-	for (size_t i = 0; i < rows; i++)
-	{
-		for (size_t j = 0; j < cols; j++)
-		{
-			if (playerID == 0)
-			{
-				player_board[i][j] = IsPlayerIdChar(playerID, full_board[i][j]) ? full_board[i][j] : player_board[i][j]
-			}
-			else
-			{
-
-			}
-
-		}
-	}
-}
-
-void GameBoardUtils::CloneBoard(char** full_board, char** player_board, int rows, int cols) {
-	InitBoard(player_board, rows, cols);
-
-	for (size_t i = 0; i < rows; i++)
-	{
-		for (size_t j = 0; j < cols; j++)
-		{
-			player_board[i][j] = full_board[i][j];
-		}
-	}
-}
-
-
-void GameBoardUtils::DeleteBoardArray(vector<GameBoard> m_boardArray) {
-	// Delete board array
-	for (int i = 0; i < rows; ++i) {
-		delete[] board[i];
-	}
-	delete[] board;
-}
-
-#pragma endregion
-
 
 
 

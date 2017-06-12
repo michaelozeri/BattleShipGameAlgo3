@@ -15,33 +15,63 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="GameBoardUtils.cpp">
+    <ClCompile Include="ArgumentParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileDirectoryUtils.cpp">
+    <ClCompile Include="DllAlgo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Bonus.cpp">
+    <ClCompile Include="GameManger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShipDetailsBoard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Board3D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="3DBoradLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameContoller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameTask.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="IOLib.h">
+    <ClInclude Include="DllAlgo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IFileDirectoryUtils.h">
+    <ClInclude Include="GameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IArgumentParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IBattleshipGameAlgo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameBoardUtils.h">
+    <ClInclude Include="ShipDetailsBoard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Contants.h">
+    <ClInclude Include="3DBoardLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Bonus.h">
+    <ClInclude Include="BoardValidator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Board3D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameTask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
