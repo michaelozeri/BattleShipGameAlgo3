@@ -121,6 +121,7 @@
     <ClCompile Include="3DBoradLoader.cpp" />
     <ClCompile Include="ArgumentParser.cpp" />
     <ClCompile Include="Board3D.cpp" />
+    <ClCompile Include="BoardValidator.cpp" />
     <ClCompile Include="DllAlgo.cpp" />
     <ClCompile Include="GameContoller.cpp" />
     <ClCompile Include="GameManger.cpp" />
