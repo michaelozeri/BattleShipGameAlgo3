@@ -5,259 +5,6 @@
 #include <Windows.h>
 #include <vector>
 
-void GetWrongSizeErrMessage(char type, int player)
-{
-	char playerChar = player == PlayerAID ? 'A' : 'B';
-	printf("Wrong size or shape for ship %c for player %c\n", type, playerChar);
-}
-
-int GetBoatTypeSizeFromChar (char type)
-{
-	switch (type)
-	{
-	case 'B':
-	case 'b':
-		return RubberBoatW;
-	case 'P':
-	case 'p':
-		return RocketShipW;
-	case 'M':
-	case 'm':
-		return SubmarineW;
-	case 'D':
-	case 'd':
-		return DestroyerW;
-	default: return 0;
-	}
-}
-
-// Recursion function. Return if adjacent exist and mark all current boat with X
-bool MarkAllBoat(char** board, int i, int j, char type, int rows, int cols)
-{
-	if (i < 0 || i >= rows || j < 0 || j >= cols) // Stop recursion condition
-	{
-		return false;
-	}
-
-	char currentCell = board[i][j];
-	if (currentCell == BLANK)
-		return false;
-	if (currentCell == 'X')
-		return false;
-	if (board[i][j] != type)
-	{
-		return true; // Adjacent exist - detect another boat of different type
-	}
-
-	board[i][j] = 'X'; // Mark current boat
-	bool left = MarkAllBoat(board, i, j - 1, type, rows, cols);
-	bool right = MarkAllBoat(board, i, j + 1, type, rows, cols);
-	bool up = MarkAllBoat(board, i - 1, j, type, rows, cols);
-	bool down = MarkAllBoat(board, i + 1, j, type, rows, cols);
-
-	return left || right || up || down;
-}
-
-/*
-* this function checks the ship size to the right or down as chosen
-*direction 1 = check to the right
-*direction 0 = check down
-*/
-bool CheckShipSize(char** board, char direction, int i, int j, char type, int rows,int cols)
-{
-	int boardTypeSize = GetBoatTypeSizeFromChar(type);
-	int sizecheck = boardTypeSize - 1;
-
-	int size = 0; // Will hold the current size of the boat
-	
-	if (direction) //if checking to the right
-	{
-		size_t a = j;
-		for (size_t k = j; k <= std::fmin(j + sizecheck, cols - 1); k++)
-		{
-			if (board[i][k] != type) // Check if next cell in right is ok - should be ok for all loop
-			{
-				return false;
-			}
-			if(i < rows-1 && board[i+1][k] == type) // check if there is no cell down of same type - should be flase
-			{
-				return false;
-			}
-			size++; // Increment boat size in case all is ok
-			
-			a = k + 1;
-		}
-		if(a < cols-1 && board[i][a] == type) //check if boat is not larger than it should be from right
-		{
-			return false;
-		}
-		return size == boardTypeSize; // Return true in case size is good, is smaller return false (if greater than terminates in the above statment)
-	}
-	else //direction of check is down
-	{
-		size_t a = i;
-		for (size_t k = i; k <= fmin(i + sizecheck, rows - 1); k++)
-		{
-			if (board[k][j] != type)// Check if next cell down is ok - should be ok for all loop
-			{
-				return false;
-			}
-			if (j < cols - 1 && board[k][j + 1] == type) // check if there is no cell right of same type - should be flase
-			{
-				return false;
-			}
-			if (j > 0 && board[k][j - 1] == type) // check if there is no cell left of same type - should be flase
-			{
-				return false;
-			}
-			size++; // Increment boat size in case all is ok
-			a = k + 1;
-		}
-		if (a < rows - 1 && board[a][j] == type) //check if boat is not larger than it should be
-		{
-			return false;
-		}
-		return size == boardTypeSize; // Return true in case size is good, is smaller return false (if greater than terminates in the above statment)
-	}
-}
-
-/*
-* this function validates the game board and prints by order the errors in the game
-*/
-BoardFileErrorCode GameBoardUtils::ValidateGameBoard(char** board, int rows, int cols)
-{ 
-	int playerAboatNum = 0; // Holds valid boat num from player A
-	int playerBboatNum = 0; // Holds valid boat num from player B
-	
-	//bitwise or these values to not go from true -> false
-	bool shapeB = false;
-	bool shapeP = false;
-	bool shapeM = false;
-	bool shapeD = false;
-	bool shapeb = false;
-	bool shapep = false;
-	bool shapem = false;
-	bool shaped = false;
-	bool adjacentErr = false;
-
-	//checking size of ships
-	for (int i = 0; i < rows; i++) 
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			char cell = board[i][j];
-			if (cell != 'X' && cell != BLANK)  //if i didnt check that place already and not BLANK
-			{
-				bool checkright = CheckShipSize(board, 1, i, j, cell,rows,cols); //check size to the right
-				bool checkdown = CheckShipSize(board, 0, i, j, cell, rows, cols); //check size down
-
-				bool isBoatOfValidSize = GetBoatTypeSizeFromChar(cell) == 1 ? checkright & checkdown : checkright^checkdown; //xor because we want only one of them to be ok
-				bool adjacent = MarkAllBoat(board, i, j, cell, rows, cols); // Flag which specified if there is another boat of different type or different player that adjacent to the current boat
-				adjacentErr = adjacentErr || adjacent;
-
-				if(isBoatOfValidSize) // Update boat number
-				{
-					if(IsPlayerIdChar(PlayerAID, cell))
-					{
-						playerAboatNum++; // Add valid ship for player A
-					}
-					else if(IsPlayerIdChar(PlayerBID, cell))
-					{
-						playerBboatNum++; // Add valid ship for player B
-					}
-				}
-
-				else // Update Error ofType Wrong size or shape for ship <char> for player <ID>
-				{
-					switch (cell)
-					{
-					case 'B':
-						shapeB = true; break;
-					case 'b':
-						shapeb = true; break;
-					case 'P':
-						shapeP = true; break;
-					case 'p':
-						shapep = true; break;
-					case 'M':
-						shapeM = true; break;
-					case 'm':
-						shapem = true; break;
-					case 'D':
-						shapeD = true; break;
-					case 'd':
-						shaped = true; break;
-					default: ;
-					}
-				}
-			}
-		}
-	}
-	
-	// Error Printing
-	if(shapeB)
-	{
-		GetWrongSizeErrMessage('B', PlayerAID);
-	}
-	if(shapeP)
-	{
-		GetWrongSizeErrMessage('P', PlayerAID);
-	}
-
-	if( shapeM )
-	{
-		GetWrongSizeErrMessage('M', PlayerAID);
-	}
-	if(shapeD)
-	{
-		GetWrongSizeErrMessage('D', PlayerAID);
-	}
-	if( shapeb)
-	{
-		GetWrongSizeErrMessage('b', PlayerBID);
-	}
-	if(shapep)
-	{
-		GetWrongSizeErrMessage('p', PlayerBID);
-	}
-	if(shapem)
-	{
-		GetWrongSizeErrMessage('m', PlayerBID);
-	}
-	if(shaped)
-	{
-		GetWrongSizeErrMessage('d', PlayerBID);
-	}
-
-	// Print num of legal ships Errors
-	if(playerAboatNum < LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
-	{
-		cout << TooFewShipsA << endl;
-	}
-	if (playerAboatNum > LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
-	{
-		cout << TooManyShipsA << endl;
-	}
-	if (playerBboatNum < LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
-	{
-		cout << TooFewShipsB << endl;
-	}
-	if (playerBboatNum > LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
-	{
-		cout << TooManyShipsB << endl;
-	}
-	
-	// Print adjacent Error
-	if (adjacentErr) 
-	{
-		cout << AdjacentERR << endl;
-	}
-
-	bool isNotLegalBoard = shapeB || shapeP || shapeM || shapeD || shapeb || shapep || shapem || shaped
-		|| adjacentErr || playerAboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER || playerBboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER;
-	return isNotLegalBoard ? BoardFileErrorCode::UnknownError : BoardFileErrorCode::Success;
-}
-
 void GameBoardUtils::InitBoard(char** board, int rows, int cols, char InitChar = BLANK)
 {
 	for (size_t i = 0; i < rows; i++)
@@ -267,35 +14,6 @@ void GameBoardUtils::InitBoard(char** board, int rows, int cols, char InitChar =
 			board[i][j] = InitChar;
 		}
 	}
-}
-
-bool GameBoardUtils::IsPlayerIdChar(int playerID, char current, bool CopyAllChars){
-	if(CopyAllChars)
-	{
-		return current == RubberBoatA ||
-			current == RocketShipA ||
-			current == SubmarineA ||
-			current == DestroyerA ||
-			current == RubberBoatB ||
-			current == RocketShipB ||
-			current == SubmarineB ||
-			current == DestroyerB;
-	}
-	if (playerID == PlayerAID)
-	{
-		return current == RubberBoatA ||
-			current == RocketShipA ||
-			current == SubmarineA ||
-			current == DestroyerA;
-	}
-	if (playerID == PlayerBID)
-	{
-		return  current == RubberBoatB ||
-			current == RocketShipB ||
-			current == SubmarineB ||
-			current == DestroyerB;
-	}
-	return false;
 }
 
 int GameBoardUtils::GetCharPlayerId(char current)
@@ -355,7 +73,6 @@ void GameBoardUtils::DeleteBoard(char** board, int rows) {
 	delete[] board;
 }
 
-
 BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int cols, const string& filePath) 
 {
 	//set all board to blank
@@ -384,8 +101,6 @@ BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int
 
 	return errcode;
 }
-
-
 
 void GameBoardUtils::PrintBoard(ostream& stream, char** board, int rows, int cols) 
 {
@@ -592,5 +307,32 @@ void GameBoardUtils::InitLogger(Logger& logger,string logpath)
 	logger.InitLogger(logpath);
 }
 
-
+bool GameBoardUtils::IsPlayerIdChar(int playerID, char current, bool CopyAllChars) {
+	if (CopyAllChars)
+	{
+		return current == RubberBoatA ||
+			current == RocketShipA ||
+			current == SubmarineA ||
+			current == DestroyerA ||
+			current == RubberBoatB ||
+			current == RocketShipB ||
+			current == SubmarineB ||
+			current == DestroyerB;
+	}
+	if (playerID == PlayerAID)
+	{
+		return current == RubberBoatA ||
+			current == RocketShipA ||
+			current == SubmarineA ||
+			current == DestroyerA;
+	}
+	if (playerID == PlayerBID)
+	{
+		return  current == RubberBoatB ||
+			current == RocketShipB ||
+			current == SubmarineB ||
+			current == DestroyerB;
+	}
+	return false;
+}
 

@@ -4,8 +4,5 @@
 class BoardValidator
 {
 public:
-	static bool ValidateBoard(Board3D  boardToValidate)
-	{
-		return true;
-	}
+	static BoardFileErrorCode ValidateBoard(Board3D  boardToValidate);
 };
