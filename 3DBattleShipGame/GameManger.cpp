@@ -3,99 +3,23 @@
 #include "Contants.h"
 #include "GameBoardUtils.h"
 #include "ShipDetailsBoard.h"
+#include "Board3D.h"
 
-GameManager::GameManager(Configuration& config): config(config)
+GameManager::GameManager(unique_ptr<IBattleshipGameAlgo> algo1, unique_ptr<IBattleshipGameAlgo> algo2, Board3D board, int id) :
+	game_id(id), algo1(algo1.get()), algo2(algo2.get()), ptr1(move(algo1)), ptr2(move(algo2)), mainGameBoard(board)
 {
-}
-
-bool GameManager::ConfigureDll() 
-{
-	vector<string> collection;
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", collection);
-	if (cnt < 2)
-	{
-		MainLogger.logFile << "Missing *.dll file. Found " << cnt << endl;
-		cout << "Missing an algorithm (dll) file looking in path: " << config.path << endl;
-		return false;
-	}
-
-	dllPaths.first = collection[0];
-	dllPaths.second = collection[1];
-
-	MainLogger.logFile << "First Algo path: " << dllPaths.first << endl;
-	MainLogger.logFile << "Second Algo path: " << dllPaths.second << endl;
-	return true;
-}
-
-bool GameManager::ConfigurePath() const
-{
-	if(!config.path.empty())
-	{
-		MainLogger.logFile << "Path provided in the argument is " << config.path << endl;
-		config.path = IFileDirectoryUtils::GetFullPath(config.path);
-		if(IFileDirectoryUtils::DirExists(config.path))
-		{
-			MainLogger.logFile << "Full path directory exist: " << config.path << endl;
-			return true;
-		}
-		MainLogger.logFile << "Path is not exist " << config.path << endl;
-		cout << "Wrong Path: " << config.path << endl;
-		return false;
-	}
-	MainLogger.logFile << "Path is not specified in the argument, getting current working directory" << endl;
-	config.path = IFileDirectoryUtils::GetCurrentWorkingDirectory();
 	
-	if(IFileDirectoryUtils::DirExists(config.path))
-	{
-		MainLogger.logFile << "Current working directory is " << config.path << endl;
-		return true;
-	}
-	cout << "Wrong Path: " << config.path << endl;
-	return false;
-}
-
-bool GameManager::ConfigureBoard()
-{
-	vector<string> collection;
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.sboard", collection);
-	if(cnt <= 0)
-	{
-		MainLogger.logFile << "Missing *.sboard file" << endl;
-		cout << "Missing board file (*.sboard) looking in path: " << config.path << endl;
-		return false;
-	}
-	
-	string boardPath = collection[0];
-	MainLogger.logFile << "Board path in use is " << boardPath << endl;
-
-	mainGameBoard = GameBoardUtils::InitializeNewEmptyBoard(ROWS,COLS);
-	//load main game board from file & validate the board
-	if (GameBoardUtils::LoadBoardFromFile(mainGameBoard, ROWS, COLS, boardPath) != BoardFileErrorCode::Success)
-	{
-		MainLogger.logFile << "Failed to validate successfuly board" << endl;
-		return false;
-	}
-
-	MainLogger.logFile << "Board was validated successfuly" << endl;
-	GameBoardUtils::PrintBoard(MainLogger.logFile, mainGameBoard, ROWS, COLS);
-	return true;
-}
-
-bool GameManager::ConfigureFiles()
-{
-	bool res1 = ConfigureBoard();
-	bool res2 = ConfigureDll();
-
-	return res1 && res2;
 }
 
 bool GameManager::InitPlayers()
 {
-	return InitDllAlgo(algo1, dllPaths.first, PlayerAID) && InitDllAlgo(algo2, dllPaths.second, PlayerBID);
+	//return InitDllAlgo(algo1, dllPaths.first, PlayerAID) && InitDllAlgo(algo2, dllPaths.second, PlayerBID);
+	return true;
 }
 
 bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) const
 {
+	/*
 	bool result  = algo.LoadDll(path);
 	if(!result)
 	{
@@ -108,36 +32,24 @@ bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) 
 	//algo.algo->setBoard(playerID, const_cast<const char**>(playerboard), ROWS, COLS);
 	GameBoardUtils::DeleteBoard(playerboard, ROWS);
 
-	MainLogger.logFile << "Set board for player " << playerID << " finished" << endl;
+	GameLogger.logFile << "Set board for player " << playerID << " finished" << endl;
 
 	// Init
 	//result = algo.algo->init(config.path);
 	if(!result)
 	{
-		MainLogger.logFile << "Failed to init for player " << playerID << endl;
+		GameLogger.logFile << "Failed to init for player " << playerID << endl;
 		cout << "Algorithm initialization failed for dll: " << path << endl;
 		return false;
 	}
 	
-	MainLogger.logFile << "Init successfuly for player " << playerID << endl;
+	GameLogger.logFile << "Init successfuly for player " << playerID << endl;*/
 	return true;
 }
 
 int GameManager::GameInitializer()
 {
-	bool result = ConfigurePath();
-	if (!result)
-	{
-		return ErrorExitCode;
-	}
-
-	result = ConfigureFiles();
-	if (!result)
-	{
-		return ErrorExitCode;
-	}
-
-	result = InitPlayers();
+	bool result = InitPlayers();
 	if (!result)
 	{
 		return ErrorExitCode;
@@ -157,7 +69,7 @@ pair<int, int> GameManager::GetNextPlayerAttack(int player_id, IBattleshipGameAl
 		//return player_b->attack();
 	}
 	// Fatal Error
-	MainLogger.logFile << "Fatal error occured. Attack move was asked for non exixting player id " << player_id << endl;
+	GameLogger.logFile << "Fatal error occured. Attack move was asked for non exixting player id " << player_id << endl;
 	return{ };
 }
 
@@ -173,6 +85,7 @@ void GameManager::PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playe
 	cout << "Player B: " << playerA.negativeScore << endl;
 }
 
+/*
 void GameManager::PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player)
 {
 	if (i < 0 || i >= ROWS || j < 0 || j >= COLS) // Stop recursion condition
@@ -191,6 +104,7 @@ void GameManager::PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j,
 	PrintSinkCharRec(maingameboard, b, i - 1, j, player);
 	PrintSinkCharRec(maingameboard, b, i + 1, j, player);
 }
+*/
 
 bool GameManager::IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB)
 {
@@ -206,6 +120,7 @@ bool GameManager::ValidAttackCor(const pair<int, int>& pair)
 
 int GameManager::PlayGame() const
 {
+	/*
 	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
 	ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
 
@@ -260,7 +175,7 @@ int GameManager::PlayGame() const
 			default: ;
 			}
 
-			MainLogger.logFile << "Player " << playerIdToPlayNext << " attack in (" << tempPair.first << "," << tempPair.second << ") result: " << resultDesc << endl;
+			GameLogger.logFile << "Player " << playerIdToPlayNext << " attack in (" << tempPair.first << "," << tempPair.second << ") result: " << resultDesc << endl;
 
 			//update players - Notify with values 1-10 and not 0-9
 			//algo1.algo->notifyOnAttackResult(playerIdToPlayNext, tempPair.first + 1, tempPair.second + 1, tempattackresult);
@@ -310,7 +225,7 @@ int GameManager::PlayGame() const
 		}
 		else
 		{
-			MainLogger.logFile << "Invlaid attack <" << tempPair.first << "," << tempPair.second
+			GameLogger.logFile << "Invlaid attack <" << tempPair.first << "," << tempPair.second
 								<< "> for player " << playerIdToPlayNext << ". Flipping players" << endl;
 			// Flip players
 			playerIdToPlayNext = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
@@ -318,50 +233,42 @@ int GameManager::PlayGame() const
 	}
 
 	bonus.Dispose(); // Important: Don't touch and don't change the order of statements [Mordehai]
-	PrintPoints(playerAboardDetails, playerBboardDetails);
+	PrintPoints(playerAboardDetails, playerBboardDetails);*/
 	return 0;
 }
 
 void GameManager::GameManagerCleanup() const
 {
-	GameBoardUtils::DeleteBoard(mainGameBoard, ROWS);
-	algo1.Dispose();
-	algo2.Dispose();
-
-	MainLogger.LoggerDispose();
+	// Do nothing
 }
+
+void GameManager::InitGameManagerLog()
+{
+	stringstream fileName;
+	fileName << "C:\\Temp\\GameLog\\" << this_thread::get_id() << "_" << game_id << ".log";
+	GameBoardUtils::InitLogger(GameLogger, fileName.str());
+
+	GameLogger << "Starting Execution thread " << this_thread::get_id() << ". With game id: " << game_id << endl;
+	GameLogger << "Board: " << endl;
+
+	mainGameBoard.PrintBoard(GameLogger.logFile);
+ }
 
 int GameManager::RunGame()
 {
-	GameBoardUtils::InitLogger(MainLogger, "GameManager.log");
+	InitGameManagerLog();
 
 	int code = GameInitializer();
 	if(code == ErrorExitCode)
 	{
 		return code;
 	}
-	MainLogger.logFile << "===== Game Initilized =======" << endl;
-
-	
+	GameLogger.logFile << "===== Game Initilized =======" << endl;
+	return 0;
 	code = PlayGame();
 	
-	MainLogger.logFile << "Game exit code is " << code << endl;
+	GameLogger.logFile << "Game exit code is " << code << endl;
 
 	GameManagerCleanup();
 	return code;
 }
-
-/*
-#pragma region Test
-
-void GameManager::Test_GetAllAttacks() const
-{
-	//pair<int, int> attack = algo1.algo->attack();
-	while (attack.first != AttckDoneIndex)
-	{
-		//MainLogger.logFile << attack.first << "," << attack.second << endl;
-		//attack = algo1.algo->attack();
-	}
-}
-
-#pragma endregion */

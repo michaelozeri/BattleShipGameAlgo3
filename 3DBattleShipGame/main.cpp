@@ -4,7 +4,6 @@
 #include "IBattleshipGameAlgo.h"
 #include "IFileDirectoryUtils.h"
 #include "IArgumentParser.h"
-#include "GameManager.h"
 #include "3DBoardLoader.h"
 #include "GameController.h"
 
@@ -23,7 +22,7 @@ int main(int argc, char* argv[])
 	Configuration config;
 	IArgumentParser::ParseArguments(config, argc, argv);
 	config.path = "C:\\Temp\\Foo1";
-	config.thread_num = 4;
+	config.thread_num = 1;
 	GameContoller gameController(config);
 
 	gameController.RunApplication();

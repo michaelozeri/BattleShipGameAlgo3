@@ -70,11 +70,19 @@ public:
 	{
 		logFile.open(logPath);
 	}
+
 	void LoggerDispose()
 	{
-		logFile << "Disposing log file" << endl;
+		if (logFile.is_open())
+		{
+			logFile << "Disposing log file" << endl;
+			logFile.close();
+		}
+	}
 
-		logFile.close();
+	~Logger()
+	{
+		LoggerDispose();
 	}
 
 	void SyncPrint(const stringstream& message)
@@ -89,7 +97,6 @@ public:
 	template<typename T>
 	std::ostream& operator<<(const T& obj)
 	{
-		cout << obj << endl;
 		return logFile << obj;
 	}
 };

@@ -6,6 +6,8 @@
 
 class GameTask {
 public:
+	int index1;
+	int index2;
 	unique_ptr<IBattleshipGameAlgo> algo1;
 	unique_ptr<IBattleshipGameAlgo> algo2;
 	int task_id;
@@ -13,4 +15,5 @@ public:
 
 	GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& factory, int id);
 	~GameTask();
+	void RunTask();
 };

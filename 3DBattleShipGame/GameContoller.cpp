@@ -46,7 +46,7 @@ void GameContoller::RunSingleThread(int id)
 
 void GameContoller::RunSingleGame(GameTask* const gameTask) 
 {
-	
+	gameTask->RunTask();
 }
 
 
@@ -56,7 +56,7 @@ GameTask* GameContoller::GetTaskElement()
 	cout << m_taskList.size() << endl;
 	if (!m_taskList.empty())
 	{
-		GameTask& x = m_taskList.front();
+		GameTask& x = move(m_taskList.front());
 		m_taskList.pop();
 		return &x;
 	}
