@@ -73,6 +73,7 @@ void GameBoardUtils::DeleteBoard(char** board, int rows) {
 	delete[] board;
 }
 
+/*
 BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int cols, const string& filePath) 
 {
 	//set all board to blank
@@ -101,6 +102,7 @@ BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int
 
 	return errcode;
 }
+*/
 
 void GameBoardUtils::PrintBoard(ostream& stream, char** board, int rows, int cols) 
 {
