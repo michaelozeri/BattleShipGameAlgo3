@@ -1,7 +1,4 @@
-
 #include "DummyAlgo.h"
-
-
 
 /**
 * \brief Return instance of NaiveBattleshipGameAlgo

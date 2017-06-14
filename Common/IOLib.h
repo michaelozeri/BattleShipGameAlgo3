@@ -3,6 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <mutex>
+#include <sstream>
 
 using namespace std;
 
@@ -62,6 +64,7 @@ public:
 class Logger{
 public:
 	ofstream logFile;
+	std::mutex print_mutex;
 
 	void InitLogger(const std::string& logPath)
 	{
@@ -72,6 +75,22 @@ public:
 		logFile << "Disposing log file" << endl;
 
 		logFile.close();
+	}
+
+	void SyncPrint(const stringstream& message)
+	{
+		if (logFile.is_open())
+		{
+			std::lock_guard<std::mutex> guard(print_mutex);
+			logFile << message.str();
+		}
+	}
+
+	template<typename T>
+	std::ostream& operator<<(const T& obj)
+	{
+		cout << obj << endl;
+		return logFile << obj;
 	}
 };
 

@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 	Configuration config;
 	IArgumentParser::ParseArguments(config, argc, argv);
 	config.path = "C:\\Temp\\Foo1";
-
+	config.thread_num = 4;
 	GameContoller gameController(config);
 
 	gameController.RunApplication();

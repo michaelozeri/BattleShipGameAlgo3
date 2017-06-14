@@ -2,10 +2,65 @@
 #include "IFileDirectoryUtils.h"
 #include "Contants.h"
 #include "3DBoardLoader.h"
+#include <thread>
+#include <sstream>
 
 GameContoller::GameContoller(Configuration& config): config(config)
 {
 
+}
+
+void GameContoller::RunSingleThread(int id)
+{
+	thread::id currentThreadId = this_thread::get_id();
+	stringstream ss;
+	GameTask* task = nullptr;
+	do {
+		ss.str(string());
+		ss << currentThreadId << ": Gettign element from queue" << endl;
+		MainLogger.SyncPrint(ss);
+
+		task = GetTaskElement();
+
+		if (task == nullptr)
+		{
+			ss.str(string());
+			ss << currentThreadId << ": Element is null" << endl;
+			MainLogger.SyncPrint(ss);
+		}
+		else
+		{
+			ss.str(string());
+			cout << ss.str();
+			ss << currentThreadId << ": Element isn't null. TaskID: " << task->task_id << endl;
+			MainLogger.SyncPrint(ss);
+			RunSingleGame(task);
+			
+		}
+	} while (task != nullptr);
+
+	ss.str(string());
+	ss << currentThreadId << ": Exit" << endl;
+	MainLogger.SyncPrint(ss);
+}
+
+void GameContoller::RunSingleGame(GameTask* const gameTask) 
+{
+	
+}
+
+
+GameTask* GameContoller::GetTaskElement()
+{
+	std::lock_guard<std::mutex> guard(task_mutex);
+	cout << m_taskList.size() << endl;
+	if (!m_taskList.empty())
+	{
+		GameTask& x = m_taskList.front();
+		m_taskList.pop();
+		return &x;
+	}
+	return nullptr;
 }
 
 void GameContoller::RunApplication()
@@ -18,6 +73,22 @@ void GameContoller::RunApplication()
 	}
 
 	PrintGameControllerInfo();
+
+	MainLogger.logFile << "Starting filling task queue" << endl;
+	result = GenerateGameQueue();
+	MainLogger.logFile << "Successfully GenerateGameQueue" << endl;
+
+	int id = 0;
+	vector<thread> threads(config.thread_num);
+	for (auto & t : threads)
+	{
+		t = thread(&GameContoller::RunSingleThread, this,id);
+		++id;
+	}
+
+	for (auto & t : threads) {
+		t.join();
+	}
 }
 
 int GameContoller::InitGameController()
@@ -44,9 +115,6 @@ int GameContoller::InitGameController()
 		MainLogger.logFile << "Failed to ConfigureDll" << endl;
 		return ErrorExitCode;
 	}
-
-	MainLogger.logFile << "Starting filling task queue" << endl;
-	result = GenerateGameQueue();
 
 	MainLogger.logFile << "Successfully Initlizlized Game Controller" << endl;
 	return 0;
@@ -94,14 +162,15 @@ bool GameContoller::ConfigureBoards()
 bool GameContoller::GenerateGameQueue()
 {
 	int numOfAlgos = static_cast<int>(algos_factory.size());
-
+	int task_id = 0;
 	for each (Board3D gameBoard in board3_ds)
 	{
 		for (int i = 1; i < numOfAlgos; i++)
 		{
 			for (int j = 0; j < numOfAlgos; j++)
 			{
-				m_taskList.emplace(j, (j + i) % numOfAlgos, gameBoard, algos_factory);
+				m_taskList.emplace(j, (j + i) % numOfAlgos, gameBoard, algos_factory, task_id);
+				++task_id;
 			}
 		}
 	}

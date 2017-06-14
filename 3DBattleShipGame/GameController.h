@@ -10,6 +10,7 @@ class GameContoller
 {
 public:
 	GameContoller(Configuration& config);
+	void RunSingleThread(int id);
 	void RunApplication();
 
 private:
@@ -18,6 +19,7 @@ private:
 	vector<string> dll_paths;
 	vector<DllAlgo> algos_factory;
 	queue<GameTask> m_taskList;
+	mutex task_mutex;
 
 	int InitGameController();
 	bool ConfigurePath() const;
@@ -28,4 +30,6 @@ private:
 
 	void PrintGameControllerInfo() const;
 
+	void RunSingleGame(GameTask*const gameTask);
+	GameTask* GetTaskElement();
 };
