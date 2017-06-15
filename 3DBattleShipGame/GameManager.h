@@ -3,25 +3,27 @@
 #include "Board3D.h"
 #include <memory>
 #include "IBattleshipGameAlgo.h"
+#include "BoardDataView.h"
 
 extern Logger MainLogger;
 
 class GameManager
 {
 private:
+	BoardDataView view1;
+	BoardDataView view2;
+
 	int game_id;
 	Logger GameLogger;
-	IBattleshipGameAlgo* algo1;
-	IBattleshipGameAlgo* algo2;
 
-	unique_ptr<IBattleshipGameAlgo> ptr1;
-	unique_ptr<IBattleshipGameAlgo> ptr2;
+	unique_ptr<IBattleshipGameAlgo> algo_ptr1;
+	unique_ptr<IBattleshipGameAlgo> algo_ptr2;
 
 	// board - will save updated and full board of two players
 	Board3D mainGameBoard;
 
 	bool InitPlayers();
-	bool InitDllAlgo(int playerID) const;
+	bool InitDllAlgo(int playerID);
 
 	int GameInitializer();
 	pair<int, int> GetNextPlayerAttack(int player_id, IBattleshipGameAlgo* player_a, IBattleshipGameAlgo* player_b);

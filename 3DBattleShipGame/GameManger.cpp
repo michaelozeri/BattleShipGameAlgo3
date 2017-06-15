@@ -6,36 +6,29 @@
 #include "Board3D.h"
 
 GameManager::GameManager(unique_ptr<IBattleshipGameAlgo> algo1, unique_ptr<IBattleshipGameAlgo> algo2, Board3D board, int id) :
-	game_id(id), algo1(algo1.get()), algo2(algo2.get()), ptr1(move(algo1)), ptr2(move(algo2)), mainGameBoard(board)
+	view1(board, PlayerAID), view2(board, PlayerBID), game_id(id),
+	algo_ptr1(move(algo1)), algo_ptr2(move(algo2)), mainGameBoard(move(board))
 {
-	
 }
 
 bool GameManager::InitPlayers()
 {
 	return InitDllAlgo(PlayerAID) && InitDllAlgo(PlayerBID);
-	return true;
 }
 
-bool GameManager::InitDllAlgo( int playerID) const
+bool GameManager::InitDllAlgo( int playerID)
 {
-	/*
-	// Set Player Board
-	//algo.algo->setBoard(playerID, const_cast<const char**>(playerboard), ROWS, COLS);
-	GameBoardUtils::DeleteBoard(playerboard, ROWS);
+	unique_ptr<IBattleshipGameAlgo>::pointer algo_ptr = playerID == PlayerAID ? algo_ptr1.get() : algo_ptr2.get();
 
-	GameLogger.logFile << "Set board for player " << playerID << " finished" << endl;
-
-	// Init
-	//result = algo.algo->init(config.path);
-	if(!result)
-	{
-		GameLogger.logFile << "Failed to init for player " << playerID << endl;
-		//cout << "Algorithm initialization failed for dll: " << path << endl;
-		return false;
-	}
+	// First Step: Set Player Board - No Return Value
+	GameLogger << "Set Player Id with Value: " << playerID << endl;
+	algo_ptr->setPlayer(playerID);
 	
-	GameLogger.logFile << "Init successfuly for player " << playerID << endl;*/
+	// Second Step: SetBoard - No Return Value
+	GameLogger.logFile << "Set board for player " << playerID << endl;
+	algo_ptr->setBoard(playerID == PlayerAID ? view1 : view2);
+
+	GameLogger.logFile << "Init successfuly for player " << playerID << endl;
 	return true;
 }
 
@@ -108,7 +101,6 @@ bool GameManager::ValidAttackCor(const pair<int, int>& pair)
 {
 	return pair.first > 0 && pair.first <= ROWS && pair.second > 0 && pair.second <= COLS;
 }
-
 
 int GameManager::PlayGame() const
 {
@@ -256,7 +248,7 @@ int GameManager::RunGame()
 		return code;
 	}
 	GameLogger.logFile << "===== Game Initilized =======" << endl;
-	
+	return 0;
 	code = PlayGame();
 	
 	GameLogger.logFile << "Game exit code is " << code << endl;

@@ -54,7 +54,6 @@ void GameContoller::RunSingleGame(GameTask& gameTask)
 	gameTask.RunTask();
 }
 
-
 bool GameContoller::GetTaskElement(GameTask& task)
 {
 	std::lock_guard<std::mutex> guard(task_mutex);
