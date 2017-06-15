@@ -69,6 +69,7 @@ public:
 	void InitLogger(const std::string& logPath)
 	{
 		logFile.open(logPath);
+		logFile << "Starting log file for Path " << logPath << endl;
 	}
 
 	void LoggerDispose()
