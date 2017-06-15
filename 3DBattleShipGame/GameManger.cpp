@@ -13,22 +13,14 @@ GameManager::GameManager(unique_ptr<IBattleshipGameAlgo> algo1, unique_ptr<IBatt
 
 bool GameManager::InitPlayers()
 {
-	//return InitDllAlgo(algo1, dllPaths.first, PlayerAID) && InitDllAlgo(algo2, dllPaths.second, PlayerBID);
+	return InitDllAlgo(PlayerAID) && InitDllAlgo(PlayerBID);
 	return true;
 }
 
-bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) const
+bool GameManager::InitDllAlgo( int playerID) const
 {
 	/*
-	bool result  = algo.LoadDll(path);
-	if(!result)
-	{
-		cout << "Cannot load dll: " << path;
-		return false;
-	}
-
 	// Set Player Board
-	char** playerboard = GameBoardUtils::ClonePlayerBoard(const_cast<const char**>(mainGameBoard), playerID,ROWS,COLS);
 	//algo.algo->setBoard(playerID, const_cast<const char**>(playerboard), ROWS, COLS);
 	GameBoardUtils::DeleteBoard(playerboard, ROWS);
 
@@ -39,7 +31,7 @@ bool GameManager::InitDllAlgo(DllAlgo& algo, const string & path, int playerID) 
 	if(!result)
 	{
 		GameLogger.logFile << "Failed to init for player " << playerID << endl;
-		cout << "Algorithm initialization failed for dll: " << path << endl;
+		//cout << "Algorithm initialization failed for dll: " << path << endl;
 		return false;
 	}
 	
@@ -264,7 +256,7 @@ int GameManager::RunGame()
 		return code;
 	}
 	GameLogger.logFile << "===== Game Initilized =======" << endl;
-	return 0;
+	
 	code = PlayGame();
 	
 	GameLogger.logFile << "Game exit code is " << code << endl;

@@ -28,6 +28,7 @@ private:
 
 	bool LoadAllAvailableBoardsPath();
 	bool LoadBoardFromPath(const string& path) const;
+	bool ValidateBoard(Board3D& boardToValidate) const;
 	void LoadBoardFromFile(Board3D& board3_d, FileReader& file_reader) const;
 	static bool ReadEmptyLineAfterDimension(FileReader& file_reader);
 	bool GetBoardDimension(BoardDimension& board_dimension, FileReader& file_reader) const;

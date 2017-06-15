@@ -309,18 +309,8 @@ void GameBoardUtils::InitLogger(Logger& logger,string logpath)
 	logger.InitLogger(logpath);
 }
 
-bool GameBoardUtils::IsPlayerIdChar(int playerID, char current, bool CopyAllChars) {
-	if (CopyAllChars)
-	{
-		return current == RubberBoatA ||
-			current == RocketShipA ||
-			current == SubmarineA ||
-			current == DestroyerA ||
-			current == RubberBoatB ||
-			current == RocketShipB ||
-			current == SubmarineB ||
-			current == DestroyerB;
-	}
+bool GameBoardUtils::IsPlayerIdChar(int playerID, char current) 
+{
 	if (playerID == PlayerAID)
 	{
 		return current == RubberBoatA ||

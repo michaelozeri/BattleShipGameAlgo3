@@ -11,6 +11,7 @@ class GameContoller
 public:
 	GameContoller(Configuration& config);
 	void RunSingleThread(int id);
+	void PrintGameQueue();
 	void RunApplication();
 
 private:
@@ -30,6 +31,6 @@ private:
 
 	void PrintGameControllerInfo() const;
 
-	void RunSingleGame(GameTask*const gameTask);
-	GameTask* GetTaskElement();
+	void RunSingleGame(GameTask& gameTask);
+	bool GetTaskElement(GameTask& task);
 };

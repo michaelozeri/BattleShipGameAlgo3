@@ -121,6 +121,7 @@
     <ClCompile Include="3DBoradLoader.cpp" />
     <ClCompile Include="ArgumentParser.cpp" />
     <ClCompile Include="Board3D.cpp" />
+    <ClCompile Include="BoardDataView.cpp" />
     <ClCompile Include="BoardValidator.cpp" />
     <ClCompile Include="DllAlgo.cpp" />
     <ClCompile Include="GameContoller.cpp" />
@@ -132,6 +133,7 @@
   <ItemGroup>
     <ClInclude Include="3DBoardLoader.h" />
     <ClInclude Include="Board3D.h" />
+    <ClInclude Include="BoardDataView.h" />
     <ClInclude Include="BoardValidator.h" />
     <ClInclude Include="DllAlgo.h" />
     <ClInclude Include="GameController.h" />

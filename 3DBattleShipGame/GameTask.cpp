@@ -2,14 +2,13 @@
 #include "GameManager.h"
 
 
-GameTask::GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& factory, int id) 
-: index1(index1), index2(index2), algo1(factory[index1].GetAlgoInstance()), algo2(factory[index2].GetAlgoInstance()),
-                      task_id(id), m_gameBoard(gameBoard)
+GameTask::GameTask(): index1(0), index2(0), task_id(0), m_gameBoard()
 {
-	
 }
 
-GameTask::~GameTask()
+GameTask::GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& factory, int id)
+	: index1(index1), index2(index2), algo1(factory[index1].GetAlgoInstance()), algo2(factory[index2].GetAlgoInstance()),
+	task_id(id), m_gameBoard(gameBoard)
 {
 }
 

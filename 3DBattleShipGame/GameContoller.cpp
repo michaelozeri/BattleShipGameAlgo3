@@ -14,15 +14,16 @@ void GameContoller::RunSingleThread(int id)
 {
 	thread::id currentThreadId = this_thread::get_id();
 	stringstream ss;
-	GameTask* task = nullptr;
+	GameTask task;
+	bool result;
 	do {
 		ss.str(string());
 		ss << currentThreadId << ": Gettign element from queue" << endl;
 		MainLogger.SyncPrint(ss);
 
-		task = GetTaskElement();
+		result = GetTaskElement(task);
 
-		if (task == nullptr)
+		if (!result)
 		{
 			ss.str(string());
 			ss << currentThreadId << ": Element is null" << endl;
@@ -31,36 +32,40 @@ void GameContoller::RunSingleThread(int id)
 		else
 		{
 			ss.str(string());
-			cout << ss.str();
-			ss << currentThreadId << ": Element isn't null. TaskID: " << task->task_id << endl;
+			ss << currentThreadId << ": Element isn't null. TaskID: " << task.task_id << endl;
 			MainLogger.SyncPrint(ss);
 			RunSingleGame(task);
 			
 		}
-	} while (task != nullptr);
+	} while (result);
 
 	ss.str(string());
 	ss << currentThreadId << ": Exit" << endl;
 	MainLogger.SyncPrint(ss);
 }
 
-void GameContoller::RunSingleGame(GameTask* const gameTask) 
+void GameContoller::PrintGameQueue()
 {
-	gameTask->RunTask();
+	// Cannot be implemented
+}
+
+void GameContoller::RunSingleGame(GameTask& gameTask) 
+{
+	gameTask.RunTask();
 }
 
 
-GameTask* GameContoller::GetTaskElement()
+bool GameContoller::GetTaskElement(GameTask& task)
 {
 	std::lock_guard<std::mutex> guard(task_mutex);
 	cout << m_taskList.size() << endl;
 	if (!m_taskList.empty())
 	{
-		GameTask& x = move(m_taskList.front());
+		task = (move(m_taskList.front()));
 		m_taskList.pop();
-		return &x;
+		return true;
 	}
-	return nullptr;
+	return false;
 }
 
 void GameContoller::RunApplication()
@@ -77,6 +82,8 @@ void GameContoller::RunApplication()
 	MainLogger.logFile << "Starting filling task queue" << endl;
 	result = GenerateGameQueue();
 	MainLogger.logFile << "Successfully GenerateGameQueue" << endl;
+
+	PrintGameQueue();
 
 	int id = 0;
 	vector<thread> threads(config.thread_num);
@@ -163,7 +170,7 @@ bool GameContoller::GenerateGameQueue()
 {
 	int numOfAlgos = static_cast<int>(algos_factory.size());
 	int task_id = 0;
-	for each (Board3D gameBoard in board3_ds)
+	for each (const Board3D& gameBoard in board3_ds)
 	{
 		for (int i = 1; i < numOfAlgos; i++)
 		{

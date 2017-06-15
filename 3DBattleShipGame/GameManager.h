@@ -1,8 +1,8 @@
 #pragma once
-#include "DllAlgo.h"
 #include "ShipDetailsBoard.h"
 #include "Board3D.h"
 #include <memory>
+#include "IBattleshipGameAlgo.h"
 
 extern Logger MainLogger;
 
@@ -21,7 +21,7 @@ private:
 	Board3D mainGameBoard;
 
 	bool InitPlayers();
-	bool InitDllAlgo(DllAlgo& algo, const string& path, int playerID) const;
+	bool InitDllAlgo(int playerID) const;
 
 	int GameInitializer();
 	pair<int, int> GetNextPlayerAttack(int player_id, IBattleshipGameAlgo* player_a, IBattleshipGameAlgo* player_b);

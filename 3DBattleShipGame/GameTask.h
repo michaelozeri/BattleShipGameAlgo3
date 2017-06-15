@@ -12,8 +12,8 @@ public:
 	unique_ptr<IBattleshipGameAlgo> algo2;
 	int task_id;
 	Board3D m_gameBoard;
-
+	GameTask();
 	GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& factory, int id);
-	~GameTask();
+	
 	void RunTask();
 };

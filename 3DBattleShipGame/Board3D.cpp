@@ -1,6 +1,5 @@
 #include "Board3D.h"
 #include <ostream>
-#include "IFileDirectoryUtils.h"
 
 using namespace std;
 
@@ -37,6 +36,10 @@ void Board3D::SetInitialChar(char initialChar)
 	}
 }
 
+Board3D::Board3D(): m_Rows(0), m_Cols(0), m_Depth(0)
+{
+}
+
 void Board3D::PrintBoard(ostream& stream) const
 {
 	for (int k = 0; k < m_Depth; ++k)
@@ -52,6 +55,11 @@ void Board3D::PrintBoard(ostream& stream) const
 
 		stream << endl;
 	}
+}
+
+char Board3D::ChatAt(Coordinate& cor) const
+{
+	return m_board[cor.row][cor.col][cor.depth];
 }
 
 Board3D::~Board3D()
