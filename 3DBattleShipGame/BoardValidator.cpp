@@ -208,7 +208,7 @@ void GetWrongSizeErrMessage(char type, int player)
 	printf("Wrong size or shape for ship %c for player %c\n", type, playerChar);
 }
 
-bool BoardValidator::ValidateBoard(Board3D& boardToValidate,Logger& mainLogger)
+bool BoardValidator::ValidateBoard(Board3D& boardToValidate, Logger& mainLogger)
 {
 	int playerAboatNum = 0; // Holds valid boat num from player A
 	int playerBboatNum = 0; // Holds valid boat num from player B

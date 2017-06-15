@@ -1,8 +1,7 @@
 #pragma once
 #include "Board3D.h"
-#include <iostream>
-#include "../Common/IOLib.h"
-#include "../Common/GameBoardUtils.h"
+#include "IOLib.h"
+#include "GameBoardUtils.h"
 
 using namespace std;
 

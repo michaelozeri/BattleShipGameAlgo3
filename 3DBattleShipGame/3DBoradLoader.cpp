@@ -94,7 +94,7 @@ bool BoardLoader::LoadBoardFromPath(const string& path) const
 bool BoardLoader::ValidateBoard(Board3D& boardToValidate) const
 {
 	return true;
-	return BoardValidator::ValidateBoard(boardToValidate);
+	return BoardValidator::ValidateBoard(boardToValidate, MainLogger);
 }
 
 void BoardLoader::LoadBoardFromFile(Board3D& board3_d, FileReader& file_reader) const
