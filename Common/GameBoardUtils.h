@@ -21,7 +21,7 @@ public:
 	static char** InitializeNewEmptyBoard(int rows, int cols);
 	static void DeleteBoard(char** board, int rows);
 	static BoardFileErrorCode LoadBoardFromFile(char** board, int rows, int cols, const string& filePath);
-	static void PrintBoard(ostream& stream, char** board, int rows, int cols);
+	static void PrintBoard(ostream& stream, vector<vector<vector<char>>> board, int rows, int cols, int depth);
 	static void CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols,bool copyAllChars = false);
 	static void CloneBoard(char** full_board, char** player_board, int rows, int cols);
 	static void MarkCannotAttack(char** markBoard, int playernum, const char** mainBoard, int rows, int cols );

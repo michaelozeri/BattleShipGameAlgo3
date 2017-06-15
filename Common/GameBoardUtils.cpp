@@ -104,16 +104,22 @@ BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int
 }
 */
 
-void GameBoardUtils::PrintBoard(ostream& stream, char** board, int rows, int cols) 
+void GameBoardUtils::PrintBoard(ostream& stream, vector<vector<vector<char>>> board, int rows, int cols,int depth) 
 {
-	for (int i = 0; i < rows; i++)
+	for (int k = 0; k < depth; k++)
 	{
-		for (int j = 0; j < cols; j++)
+		stream << endl;
+		for (int i = 0; i < rows; i++)
 		{
-			stream << board[i][j];
+			for (int j = 0; j < cols; j++)
+			{
+				stream << board[i][j][k];
+			}
+			stream << endl;
 		}
 		stream << endl;
 	}
+	
 }
 
 void GameBoardUtils::CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols,bool CopyAllChars) {
