@@ -80,7 +80,7 @@ bool BoardLoader::LoadBoardFromPath(const string& path) const
 	board3_d.PrintBoard(MainLogger.logFile);
 
 	MainLogger.logFile << "Starting validation process for 3D game board" << endl;
-	result = BoardValidator::ValidateBoard(board3_d);
+	result = BoardValidator::ValidateBoard(board3_d,MainLogger);
 
 	MainLogger.logFile << "Validation result is: " << result << endl;
 	if(result)

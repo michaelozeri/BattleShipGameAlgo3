@@ -17,12 +17,13 @@ int main(int argc, char* argv[])
 {
 	//RunTest();
 	//return 0;
-	GameBoardUtils::InitLogger(MainLogger, "GameManager.log");
+	
 
 	Configuration config;
 	IArgumentParser::ParseArguments(config, argc, argv);
-	config.path = "C:\\Temp\\Foo1";
-	config.thread_num = 1;
+	GameBoardUtils::InitLogger(MainLogger, "GameManager.log");
+	//config.path = "C:\\Temp\\Foo1";
+	//config.thread_num = 1;
 	GameContoller gameController(config);
 
 	gameController.RunApplication();

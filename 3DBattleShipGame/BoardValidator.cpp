@@ -145,7 +145,7 @@ bool CheckShipSize(vector<vector<vector<char>>> board, int direction, int i, int
 					}
 				}
 			}
-			if (l = k) { //checking down and right one square
+			if (l == k) { //checking down and right one square
 				if (i < rows - 1) {
 					if (board[i + 1][j][l] == charType) {
 						return false;
@@ -172,7 +172,7 @@ bool CheckShipSize(vector<vector<vector<char>>> board, int direction, int i, int
 /*
 * Recursive function. Return if adjacent exist and mark all current boat with 'X'
 */
-bool MarkAllBoat(vector<vector<vector<char>>> board, int i, int j, int k, char type, int rows, int cols, int depth)
+bool MarkAllBoat(vector<vector<vector<char>>>& board, int i, int j, int k, char type, int rows, int cols, int depth)
 {
 	// Stop recursion condition
 	if (i < 0 || i >= rows || j < 0 || j >= cols || k<0 || k >= depth)
@@ -208,7 +208,7 @@ void GetWrongSizeErrMessage(char type, int player)
 	printf("Wrong size or shape for ship %c for player %c\n", type, playerChar);
 }
 
-bool BoardValidator::ValidateBoard(Board3D boardToValidate)
+bool BoardValidator::ValidateBoard(Board3D& boardToValidate,Logger& mainLogger)
 {
 	int playerAboatNum = 0; // Holds valid boat num from player A
 	int playerBboatNum = 0; // Holds valid boat num from player B
@@ -288,6 +288,8 @@ bool BoardValidator::ValidateBoard(Board3D boardToValidate)
 						}
 					}
 				}
+				boardToValidate.PrintBoard(mainLogger.logFile);
+				mainLogger.logFile << "finished board" << endl;
 			}
 		}
 	}
