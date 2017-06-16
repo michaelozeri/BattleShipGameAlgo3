@@ -146,43 +146,44 @@ void GameBoardUtils::CloneBoard(char** full_board, char** player_board, int rows
 	}
 }
 
-void GameBoardUtils::MarkCannotAttack(char** markBoard, int playernum, const char** mainBoard, int rows, int cols)
-{
+void GameBoardUtils::MarkCannotAttack(int playernum, Board3D& mainBoard, int rows, int cols, int depth) {
 	char cannotAttckChar = CannotAttck;
 
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < cols; j++)
-		{
-			if (IsPlayerIdChar(playernum, mainBoard[i][j]))
-			{
-				// mark me
-				markBoard[i][j] = cannotAttckChar;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			for (int k = 0; k < depth; k++) {
+				// need to reach for char at the vector and change it...
+				if (IsPlayerIdChar(playernum, mainBoard.))
+				{
+					// mark me
+					markBoard[i][j][k] = cannotAttckChar;
 
-				//mark left of me
-				if ((j > 0) && (!IsPlayerIdChar(playernum, mainBoard[i][j - 1])))
-				{
-					markBoard[i][j - 1] = cannotAttckChar;
+					//mark left of me
+					if ((j > 0) && (!IsPlayerIdChar(playernum, mainBoard[i][j - 1])))
+					{
+						markBoard[i][j - 1] = cannotAttckChar;
+					}
+					//mark right of me
+					if ((j < cols - 1) && (!IsPlayerIdChar(playernum, mainBoard[i][j + 1])))
+					{
+						markBoard[i][j + 1] = cannotAttckChar;
+					}
+					//mark above me
+					if ((i > 0) && (!IsPlayerIdChar(playernum, mainBoard[i - 1][j])))
+					{
+						markBoard[i - 1][j] = cannotAttckChar;
+					}
+					//mark below me
+					if ((i < rows - 1) && (!IsPlayerIdChar(playernum, mainBoard[i + 1][j])))
+					{
+						markBoard[i + 1][j] = cannotAttckChar;
+					}
 				}
-				//mark right of me
-				if ((j < cols - 1) && (!IsPlayerIdChar(playernum, mainBoard[i][j + 1])))
-				{
-					markBoard[i][j + 1] = cannotAttckChar;
-				}
-				//mark above me
-				if ((i > 0) && (!IsPlayerIdChar(playernum, mainBoard[i - 1][j])))
-				{
-					markBoard[i - 1][j] = cannotAttckChar;
-				}
-				//mark below me
-				if ((i < rows - 1) && (!IsPlayerIdChar(playernum, mainBoard[i + 1][j])))
-				{
-					markBoard[i + 1][j] = cannotAttckChar;
-				}
+
+
 			}
 		}
 	}
-}
 
 /*
 * @param argc - of main program

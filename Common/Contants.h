@@ -18,7 +18,7 @@
 #define AttckDoneIndex -1
 
 // Attack Flags Special Flags
-//Y - yes means we can attack here. 'N' means not
+//Y - yes means we can attack here. 'N' means not 
 #define CanAttck 'Y'
 #define CannotAttck 'N'
 
