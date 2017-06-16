@@ -29,16 +29,12 @@ private:
 	Coordinate GetNextPlayerAttack(int player_id) const;
 	AttackResult GetAttackResult(const Coordinate& pair, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
 	void PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playerB);
-	//void PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player);
-	//void PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player);
-	bool IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
+	static bool IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
 	bool ValidAttackCor(const Coordinate& pair) const;
 	int PlayGame();
 
-	void GameManagerCleanup() const;
 	void InitGameManagerLog();
 public:
 	GameManager(unique_ptr<IBattleshipGameAlgo> algo1, unique_ptr<IBattleshipGameAlgo> algo2, Board3D board, int id);
-
 	int RunGame();
 };

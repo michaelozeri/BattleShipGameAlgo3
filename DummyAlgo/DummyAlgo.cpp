@@ -55,7 +55,7 @@ void DummyAlgo::setPlayer(int player)
 
 Coordinate DummyAlgo::attack()
 {
-	return Coordinate(1, 1, 1);
+	return Coordinate(-1, -1, -1);
 }
 
 std::ostream& operator<< (std::ostream & out, AttackResult const& data)

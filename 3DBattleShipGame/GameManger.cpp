@@ -56,31 +56,10 @@ AttackResult GameManager::GetAttackResult(const Coordinate& pair, ShipDetailsBoa
 
 void GameManager::PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playerB)
 {
-	cout << "Points:" << endl;
-	cout << "Player A: " << playerB.negativeScore << endl;
-	cout << "Player B: " << playerA.negativeScore << endl;
+	GameLogger << "Points:" << endl;
+	GameLogger << "Player A: " << playerB.negativeScore << endl;
+	GameLogger << "Player B: " << playerA.negativeScore << endl;
 }
-
-/*
-void GameManager::PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player)
-{
-	if (i < 0 || i >= ROWS || j < 0 || j >= COLS) // Stop recursion condition
-	{
-		return;
-	}
-
-	char currentCell = maingameboard[i][j];
-	if (currentCell != HIT_CHAR)
-		return;
-
-	maingameboard[i][j] = SINK_CHAR;
-	b.PrintPlayerChar(maingameboard[i][j], j, i, player);
-	PrintSinkCharRec(maingameboard, b, i, j - 1, player);
-	PrintSinkCharRec(maingameboard, b, i, j + 1, player);
-	PrintSinkCharRec(maingameboard, b, i - 1, j, player);
-	PrintSinkCharRec(maingameboard, b, i + 1, j, player);
-}
-*/
 
 bool GameManager::IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB)
 {
@@ -102,7 +81,6 @@ std::ostream& operator<< (std::ostream & out, Coordinate const& data)
 
 int GameManager::PlayGame()
 {
-	/*
 	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
 	ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
 
@@ -151,34 +129,15 @@ int GameManager::PlayGame()
 			case AttackResult::Miss: resultDesc = "Miss";  break;
 			case AttackResult::Hit: resultDesc = "Hit"; break;
 			case AttackResult::Sink:resultDesc = "Sink"; break;
-			default: ;
 			}
 
 			GameLogger.logFile << "Player " << playerIdToPlayNext << " attack in " << tempPair <<" result: " << resultDesc << endl;
 
-			//update players - Notify with values 1-10 and not 0-9
-			//algo1.algo->notifyOnAttackResult(playerIdToPlayNext, tempPair.first + 1, tempPair.second + 1, tempattackresult);
-			//algo2.algo->notifyOnAttackResult(playerIdToPlayNext, tempPair.first + 1, tempPair.second + 1, tempattackresult);
-
-			if (tempattackresult != AttackResult::Miss)
+			//update players - Notify with values 1-10 and not 0-9. Scope to delete cor  object in the end
 			{
-				int playerTosetColor;
-				if (isSelfAttack)
-				{
-					playerTosetColor = playerIdToPlayNext;
-				}
-				else
-				{
-					playerTosetColor = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
-				}
-
-				if (tempattackresult == AttackResult::Sink)
-				{
-					// In case sink update all the cell to SINK_CHAR
-					PrintSinkCharRec(mainGameBoard, bonus, tempPair.first, tempPair.second, playerTosetColor);
-				}
-				else // In case hit update only the target cell
-					bonus.PrintPlayerChar(mainGameBoard[tempPair.first][tempPair.second], tempPair.second, tempPair.first, playerTosetColor);
+				Coordinate cor(tempPair.row + 1, tempPair.col + 1, tempPair.depth + 1);
+				algo_ptr1->notifyOnAttackResult(playerIdToPlayNext, cor, tempattackresult);
+				algo_ptr2->notifyOnAttackResult(playerIdToPlayNext, cor, tempattackresult);
 			}
 
 			if (tempattackresult == AttackResult::Miss || isSelfAttack)
@@ -189,36 +148,26 @@ int GameManager::PlayGame()
 
 			if (IsPlayerWon(PlayerAID, playerAboardDetails, playerBboardDetails))
 			{
-				bonus.Dispose(); // Important: Don't touch and don't change the order of statements [Mordehai]
-				cout << "Player A won" << endl;
+				GameLogger << "Player A won" << endl;
 				PrintPoints(playerAboardDetails, playerBboardDetails);
 				return 0;
 			}
 			if (IsPlayerWon(PlayerBID, playerAboardDetails, playerBboardDetails))
 			{
-				bonus.Dispose(); // Important: Don't touch and don't change the order of statements [Mordehai]
-				cout << "Player B won" << endl;
+				GameLogger << "Player B won" << endl;
 				PrintPoints(playerAboardDetails, playerBboardDetails);
 				return 0;
 			}
 		}
 		else
 		{
-			GameLogger.logFile << "Invlaid attack <" << tempPair.first << "," << tempPair.second
-								<< "> for player " << playerIdToPlayNext << ". Flipping players" << endl;
-			// Flip players
+			GameLogger << "Invlaid attack " << tempPair << " for player " << playerIdToPlayNext << ". Flipping players" << endl;
+			// Flip players in case of invalid attack
 			playerIdToPlayNext = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
 		}
 	}
-
-	bonus.Dispose(); // Important: Don't touch and don't change the order of statements [Mordehai]
-	PrintPoints(playerAboardDetails, playerBboardDetails);*/
+	PrintPoints(playerAboardDetails, playerBboardDetails);
 	return 0;
-}
-
-void GameManager::GameManagerCleanup() const
-{
-	// Do nothing
 }
 
 void GameManager::InitGameManagerLog()
@@ -247,7 +196,5 @@ int GameManager::RunGame()
 	code = PlayGame();
 	
 	GameLogger.logFile << "Game exit code is " << code << endl;
-
-	GameManagerCleanup();
 	return code;
 }
