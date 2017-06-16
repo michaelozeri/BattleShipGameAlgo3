@@ -246,7 +246,7 @@ bool BoardValidator::ValidateBoard(Board3D& boardToValidate, Logger& mainLogger)
 						checkSum = 0;
 					}
 
-					bool isBoatOfValidSize = GetBoatTypeSizeFromChar(cellChar) == 1 ? checkright & checkdown & checkdepth : checkSum; 
+					int isBoatOfValidSize = GetBoatTypeSizeFromChar(cellChar) == 1 ? checkright & checkdown & checkdepth : checkSum; 
 
 					// Flag which specified if there is another boat of different type or different player that adjacent to the current boat
 					bool adjacent = MarkAllBoat(boardToValidate.m_board, i, j,k, cellChar, rows, cols,depth); 
