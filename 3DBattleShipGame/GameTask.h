@@ -3,6 +3,7 @@
 #include "IBattleshipGameAlgo.h"
 #include <memory>
 #include "DllAlgo.h"
+#include "GameResultInfo.h"
 
 class GameTask {
 public:
@@ -14,6 +15,6 @@ public:
 	Board3D m_gameBoard;
 	GameTask();
 	GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& factory, int id);
-	
-	void RunTask();
+
+	GameResultInfo RunTask();
 };

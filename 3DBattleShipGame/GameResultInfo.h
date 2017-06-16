@@ -11,3 +11,16 @@ public:
 	{
 	}
 };
+
+class PlayerResultElement
+{
+public:
+	bool IsWon;
+	int PtsFor;
+	int PtsAgainst;
+	int PlayerId;
+
+	PlayerResultElement(bool isWon, int ptsFor, int ptsAgainst, int player_id) : IsWon(isWon), PtsFor(ptsFor), PtsAgainst(ptsAgainst), PlayerId(player_id)
+	{
+	}
+};

@@ -4,13 +4,19 @@
 #include "3DBoardLoader.h"
 #include <thread>
 #include <sstream>
+#include "GameBoardUtils.h"
 
-GameContoller::GameContoller(Configuration& config): config(config)
+GameContoller::GameContoller(Configuration& config): active_threads(0), config(config), IsReportResolts(false), IsGameFinished(false)
 {
 }
 
 void GameContoller::RunSingleThread(int id)
 {
+	int tempAT = ++active_threads;
+	stringstream at;
+	at << "Number of Active Thread : " << tempAT << endl;
+	MainLogger.SyncPrint(at);
+
 	thread::id currentThreadId = this_thread::get_id();
 	stringstream ss;
 	GameTask task;
@@ -38,7 +44,11 @@ void GameContoller::RunSingleThread(int id)
 	} while (result);
 
 	ss.str(string());
-	ss << currentThreadId << ": Exit" << endl;
+	tempAT = --active_threads;
+	if (tempAT == 0)
+		IsGameFinished = true;
+
+	ss << currentThreadId << ": Exit. Number  remain active threads " << tempAT << endl;
 	MainLogger.SyncPrint(ss);
 }
 
@@ -49,7 +59,30 @@ void GameContoller::PrintGameQueue()
 
 void GameContoller::RunSingleGame(GameTask& gameTask) 
 {
-	gameTask.RunTask();
+	bool isExistEmptyQueue = false;
+	GameResultInfo result = gameTask.RunTask();
+
+	PlayerResultElement playerAScore(result.Winner == PlayerAWinner, result.Points_PlayerA, result.Points_PlayerB, gameTask.index1);
+	PlayerResultElement playerBScore(result.Winner == PlayerBWinner, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2);
+	{
+		lock_guard<mutex>  lg(result_mutex_);
+		results[gameTask.index1].push(playerAScore);
+		results[gameTask.index2].push(playerBScore);
+
+		for each(const queue<PlayerResultElement>& q in results)
+		{
+			if (q.empty())
+			{
+				isExistEmptyQueue = true;
+				break;
+			}
+		}
+		IsReportResolts = !isExistEmptyQueue;
+	}
+	if(!isExistEmptyQueue)
+	{
+		cv.notify_one();
+	}
 }
 
 bool GameContoller::GetTaskElement(GameTask& task)
@@ -64,6 +97,53 @@ bool GameContoller::GetTaskElement(GameTask& task)
 	}
 	return false;
 }
+
+void GameContoller::ReportManager()
+{
+	Logger ReporterLogger;
+	GameBoardUtils::InitLogger(ReporterLogger, "C:\\temp\\Foo1\\ReporterLoger.log");
+
+	vector<PlayerResultElement> elementsToHandle;
+	{
+		std::unique_lock<std::mutex> lk(result_mutex_);
+		cv.wait(lk, [this] {return IsReportResolts || IsGameFinished; });
+
+		ReporterLogger << "Starting reporting" << endl;
+		int minElem = MAXINT;
+
+		for each (const queue<PlayerResultElement>& q in results)
+		{
+			minElem = static_cast<int>(min(minElem, q.size()));
+		}
+		ReporterLogger << "Min element: " << minElem << endl;
+
+		for(int i=0; i<results.size(); ++i)
+		{
+			FillElementFromQueue(elementsToHandle, i, minElem);
+		}
+		lk.unlock();
+	}
+
+	// Handle updating and reporting
+	ReporterLogger << "Release lock and handling " << elementsToHandle.size() << " elements" << endl;
+	PlayerScoreUtils::UpdatePlayerScores(PlayerScoreInfos, elementsToHandle);
+}
+
+void GameContoller::FillElementFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId, int elementsToExtract)
+{
+	queue<PlayerResultElement>& playerResultQueue = results[playerId];
+
+	for (int i = 0; i < elementsToExtract; ++i)
+	{
+		if (playerResultQueue.empty())
+			break;
+
+		PlayerResultElement temp = playerResultQueue.front();
+		collectionToFill.push_back(move(temp));
+		playerResultQueue.pop();
+	}
+}
+
 
 void GameContoller::RunApplication()
 {
@@ -90,9 +170,11 @@ void GameContoller::RunApplication()
 		++id;
 	}
 
-	for (auto & t : threads) {
+	thread report_thread(&GameContoller::ReportManager, this);
+	for (auto & t : threads) { 
 		t.join();
 	}
+	report_thread.join();
 }
 
 int GameContoller::InitGameController()
@@ -126,6 +208,8 @@ int GameContoller::InitGameController()
 
 bool GameContoller::ConfigureDll()
 {
+	vector<string> dll_names;
+
 	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", dll_paths, &dll_names);
 	MainLogger.logFile << "Found " << cnt << " Dll's" << endl;
 	
@@ -144,15 +228,21 @@ bool GameContoller::ConfigureDll()
 		if(result)
 		{
 			algos_factory.push_back(move(tempAlgo));
+			results.push_back(queue<PlayerResultElement>());
+
+			// Init player score infos
+			PlayerScoreInfos.push_back(PlayerScoreInfo(index, dll_names[index]));
 		}
-		index++;
+		++index;
 	}
 
 	index = 0;
 	MainLogger << "===== Printing Factories=======" << endl;
 	for each (const DllAlgo& algo in algos_factory)
 	{
-		MainLogger << "Path: " << algo.path << " Name: " << algo.DllName << endl;
+		MainLogger << index << ") Path: " << algo.path << " Name: " << algo.DllName << endl;
+
+		++index;
 	}
 	MainLogger << "========= End of factory content printing ==============" << endl;
 

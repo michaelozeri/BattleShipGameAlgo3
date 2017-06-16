@@ -11,8 +11,8 @@ GameTask::GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& f
 {
 }
 
-void GameTask::RunTask()
+GameResultInfo GameTask::RunTask()
 {
 	GameManager game_manager(move(algo1), move(algo2), m_gameBoard, task_id);
-	game_manager.RunGame();
+	return game_manager.RunGame();
 }

@@ -26,17 +26,6 @@ bool DllAlgo::LoadDll(const string& dllPath, string dllName)
 
 	handle = { hDll, GetAlgorithmFunc };
 
-	//TODO: Remove
-	if (false)
-	{
-		algo = GetAlgorithmFunc();
-
-		if (algo == nullptr)
-		{
-			MainLogger.logFile << "Object is nullptr after init" << endl;
-			return false;
-		}
-	}
 	MainLogger.logFile << "Load dll successfully for " << path << endl;
 	return true;
 }

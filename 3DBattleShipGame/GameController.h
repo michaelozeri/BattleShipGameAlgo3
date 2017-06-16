@@ -5,6 +5,9 @@
 #include "DllAlgo.h"
 #include "GameTask.h"
 #include <queue>
+#include "PlayerScoreInfo.h"
+#include "GameResultInfo.h"
+#include <atomic>
 
 class GameContoller
 {
@@ -15,15 +18,20 @@ public:
 	void RunApplication();
 
 private:
+	volatile atomic<int> active_threads;
 	Configuration& config;
 	vector<Board3D> board3_ds;
-	
 	vector<string> dll_paths;
-	vector<string> dll_names;
-
 	vector<DllAlgo> algos_factory;
 	queue<GameTask> m_taskList;
 	mutex task_mutex;
+
+	vector<queue<PlayerResultElement>> results;
+	std::condition_variable cv;
+	volatile bool IsReportResolts;
+	volatile bool IsGameFinished;
+	mutex result_mutex_;
+	vector<PlayerScoreInfo> PlayerScoreInfos;
 
 	int InitGameController();
 	bool ConfigurePath() const;
@@ -36,4 +44,6 @@ private:
 
 	void RunSingleGame(GameTask& gameTask);
 	bool GetTaskElement(GameTask& task);
+	void ReportManager();
+	void FillElementFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId, int elementsToExtract) ;
 };
