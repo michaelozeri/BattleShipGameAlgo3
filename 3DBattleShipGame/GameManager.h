@@ -33,7 +33,7 @@ private:
 	//void PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player);
 	bool IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
 	bool ValidAttackCor(const pair<int, int>& pair);
-	int PlayGame() const;
+	int PlayGame();
 
 	void GameManagerCleanup() const;
 	void InitGameManagerLog();

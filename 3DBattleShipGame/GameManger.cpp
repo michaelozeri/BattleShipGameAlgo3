@@ -102,18 +102,12 @@ bool GameManager::ValidAttackCor(const pair<int, int>& pair)
 	return pair.first > 0 && pair.first <= ROWS && pair.second > 0 && pair.second <= COLS;
 }
 
-int GameManager::PlayGame() const
+int GameManager::PlayGame()
 {
-	/*
 	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
 	ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
 
 	int playerIdToPlayNext = PlayerAID;
-
-	// Configure Bonus start point and color
-	Bonus bonus(!config.bonusParam.isQuiet, config.bonusParam.delayInMiliseconds);
-	bonus.Init(mainGameBoard, ROWS, COLS);
-	GameBoardUtils::ChangeFontSize();
 
 	//main game play
 	bool AattacksDone = false;
@@ -248,7 +242,7 @@ int GameManager::RunGame()
 		return code;
 	}
 	GameLogger.logFile << "===== Game Initilized =======" << endl;
-	return 0;
+	
 	code = PlayGame();
 	
 	GameLogger.logFile << "Game exit code is " << code << endl;

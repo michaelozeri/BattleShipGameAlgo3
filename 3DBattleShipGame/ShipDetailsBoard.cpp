@@ -1,30 +1,33 @@
 #include "ShipDetailsBoard.h"
 
-ShipDetailsBoard::ShipDetailsBoard(char** board, int playerID) : playerID(playerID), mainboard(board), RubberBoatCells(0), RocketShipCells(0), SubmarineCells(0), DestroyeCells(0), negativeScore(0)
+ShipDetailsBoard::ShipDetailsBoard(Board3D& board3_d, int playerID) : playerID(playerID), mainboard(board3_d), RubberBoatCells(0), RocketShipCells(0), SubmarineCells(0), DestroyeCells(0), negativeScore(0)
 {
-	for (size_t i = 0; i < ROWS; i++)
+	for (size_t k = 0; k < mainboard.m_Depth; k++)
 	{
-		for (size_t j = 0; j < COLS; j++)
+		for (size_t i = 0; i < ROWS; i++)
 		{
-			char cell = board[i][j];
-			if (_utils.IsPlayerIdChar(playerID, cell))
+			for (size_t j = 0; j < COLS; j++)
 			{
-				switch (tolower(cell))
+				char cell = board3_d.m_board[i][j][k];
+				if (_utils.IsPlayerIdChar(playerID, cell))
 				{
-				case RubberBoatB:
-					RubberBoatCells++;
-					break;
-				case RocketShipB:
-					RocketShipCells++;
-					break;
-				case SubmarineB:
-					SubmarineCells++;
-					break;
-				case DestroyerB:
-					DestroyeCells++;
-					break;
-				default:
-					break;
+					switch (tolower(cell))
+					{
+					case RubberBoatB:
+						RubberBoatCells++;
+						break;
+					case RocketShipB:
+						RocketShipCells++;
+						break;
+					case SubmarineB:
+						SubmarineCells++;
+						break;
+					case DestroyerB:
+						DestroyeCells++;
+						break;
+					default:
+						break;
+					}
 				}
 			}
 		}
@@ -36,14 +39,14 @@ ShipDetailsBoard::ShipDetailsBoard(char** board, int playerID) : playerID(player
 * \param attack
 * \return AtackResult enum instance and update the board
 */
-AttackResult ShipDetailsBoard::GetAttackResult(pair<int, int> attack)
+AttackResult ShipDetailsBoard::GetAttackResult(Coordinate attack)
 {
 	AttackResult result = AttackResult::Miss;
-	char cell = mainboard[attack.first][attack.second];
+	char cell = mainboard.m_board[attack.row][attack.col][attack.depth];
 	if (_utils.IsPlayerIdChar(playerID, cell))
 	{
-		mainboard[attack.first][attack.second] = HIT_CHAR;
-		result = IsSinkRecursiveChecker(attack.first, attack.second) ? AttackResult::Sink : AttackResult::Hit;
+		mainboard.m_board[attack.row][attack.col][attack.depth] = HIT_CHAR;
+		result = IsSinkRecursiveChecker(attack.row, attack.col, attack.depth) ? AttackResult::Sink : AttackResult::Hit;
 		switch (tolower(cell))
 		{
 		case 'b':
@@ -64,7 +67,7 @@ AttackResult ShipDetailsBoard::GetAttackResult(pair<int, int> attack)
 			break;
 		default:
 			// Restore the previous value - should not get here
-			mainboard[attack.first][attack.second] = cell;
+			mainboard.m_board[attack.row][attack.col][attack.depth] = cell;
 			break;
 		}
 	}
@@ -77,13 +80,13 @@ bool ShipDetailsBoard::IsLoose() const
 	return (sum == 0);
 }
 
-bool ShipDetailsBoard::IsSinkRecursiveChecker(int row, int col, Direction dir) const
+bool ShipDetailsBoard::IsSinkRecursiveChecker(int row, int col, int depth, Direction dir) const
 {
-	if (row < 0 || row >= ROWS || col < 0 || col >= COLS)
+	if (row < 0 || row >= mainboard.m_Rows || col < 0 || col >= mainboard.m_Cols || depth < 0 || depth >= mainboard.m_Depth)
 	{
 		return  true;
 	}
-	char cell = mainboard[row][col];
+	char cell = mainboard.m_board[row][col][depth];
 	if (cell == BLANK)
 	{
 		return true;
@@ -97,20 +100,27 @@ bool ShipDetailsBoard::IsSinkRecursiveChecker(int row, int col, Direction dir) c
 	switch (dir)
 	{
 	case Direction::Right:
-		return IsSinkRecursiveChecker(row, col + 1, Direction::Right);
+		return IsSinkRecursiveChecker(row, col + 1, depth, Direction::Right);
 		break;
 	case Direction::Left:
-		return IsSinkRecursiveChecker(row, col - 1, Direction::Left);
+		return IsSinkRecursiveChecker(row, col - 1, depth, Direction::Left);
 		break;
 	case Direction::Up:
-		return IsSinkRecursiveChecker(row - 1, col, Direction::Up);
+		return IsSinkRecursiveChecker(row - 1, col, depth, Direction::Up);
 		break;
 	case Direction::Down:
-		return IsSinkRecursiveChecker(row + 1, col, Direction::Down);
+		return IsSinkRecursiveChecker(row + 1, col, depth, Direction::Down);
+		break;
+	case Direction::Outside:
+		return IsSinkRecursiveChecker(row, col, depth - 1, Direction::Outside);
+		break;
+	case Direction::Inside:
+		return  IsSinkRecursiveChecker(row, col, depth + 1, Direction::Inside);
 		break;
 	case Direction::All:
-		return IsSinkRecursiveChecker(row, col + 1, Direction::Right) && IsSinkRecursiveChecker(row, col - 1, Direction::Left) &&
-			IsSinkRecursiveChecker(row - 1, col, Direction::Up) && IsSinkRecursiveChecker(row + 1, col, Direction::Down);
+		return IsSinkRecursiveChecker(row, col + 1, depth, Direction::Right) && IsSinkRecursiveChecker(row, col - 1, depth, Direction::Left) &&
+			IsSinkRecursiveChecker(row - 1, col, depth, Direction::Up) && IsSinkRecursiveChecker(row + 1, col, depth, Direction::Down) &&
+			IsSinkRecursiveChecker(row,col, depth -1, Direction::Outside) && IsSinkRecursiveChecker(row, col, depth + 1, Direction::Inside);
 		break;
 	}
 	return  true;
