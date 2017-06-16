@@ -26,13 +26,13 @@ private:
 	bool InitDllAlgo(int playerID);
 
 	int GameInitializer();
-	pair<int, int> GetNextPlayerAttack(int player_id, IBattleshipGameAlgo* player_a, IBattleshipGameAlgo* player_b);
-	AttackResult GetAttackResult(const pair<int, int>& pair, char** board, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
+	Coordinate GetNextPlayerAttack(int player_id) const;
+	AttackResult GetAttackResult(const Coordinate& pair, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
 	void PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playerB);
 	//void PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player);
 	//void PrintSinkCharRec(char** maingameboard, Bonus& b, int i, int j, int player);
 	bool IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB);
-	bool ValidAttackCor(const pair<int, int>& pair);
+	bool ValidAttackCor(const Coordinate& pair) const;
 	int PlayGame();
 
 	void GameManagerCleanup() const;

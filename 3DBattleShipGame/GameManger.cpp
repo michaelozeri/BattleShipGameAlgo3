@@ -43,24 +43,15 @@ int GameManager::GameInitializer()
 	return 0;
 }
 
-pair<int, int> GameManager::GetNextPlayerAttack(int player_id, IBattleshipGameAlgo*  player_a, IBattleshipGameAlgo* player_b)
+Coordinate GameManager::GetNextPlayerAttack(int player_id) const
 {
-	if (player_id == PlayerAID)
-	{
-		//return player_a->attack();
-	}
-	if (player_id == PlayerBID)
-	{
-		//return player_b->attack();
-	}
-	// Fatal Error
-	GameLogger.logFile << "Fatal error occured. Attack move was asked for non exixting player id " << player_id << endl;
-	return{ };
+	unique_ptr<IBattleshipGameAlgo>::pointer algo_ptr = player_id == PlayerAID ? algo_ptr1.get() : algo_ptr2.get();
+	return algo_ptr->attack();
 }
 
-AttackResult GameManager::GetAttackResult(const pair<int, int>& pair, char** board, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB)
+AttackResult GameManager::GetAttackResult(const Coordinate& pair, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB)
 {
-	return GameBoardUtils::IsPlayerIdChar(PlayerAID, board[pair.first][pair.second]) ? detailsA.GetAttackResult(pair) : detailsB.GetAttackResult(pair);
+	return GameBoardUtils::IsPlayerIdChar(PlayerAID, mainGameBoard.m_board[pair.row][pair.col][pair.depth]) ? detailsA.GetAttackResult(pair) : detailsB.GetAttackResult(pair);
 }
 
 void GameManager::PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playerB)
@@ -97,13 +88,21 @@ bool GameManager::IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, Shi
 }
 
 // Attack pair 1-10
-bool GameManager::ValidAttackCor(const pair<int, int>& pair)
+bool GameManager::ValidAttackCor(const Coordinate& pair) const
 {
-	return pair.first > 0 && pair.first <= ROWS && pair.second > 0 && pair.second <= COLS;
+	return pair.row > 0 && pair.row <= mainGameBoard.m_Rows && pair.col > 0 && pair.col <= mainGameBoard.m_Cols
+		&& pair.depth > 0 && pair.depth <= mainGameBoard.m_Depth;
+}
+
+std::ostream& operator<< (std::ostream & out, Coordinate const& data)
+{
+	out << "(" << data.row << ", " << data.col << ", " << data.depth << ")";
+	return out;
 }
 
 int GameManager::PlayGame()
 {
+	/*
 	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
 	ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
 
@@ -116,8 +115,8 @@ int GameManager::PlayGame()
 	// While not both of players ended their attacks
 	while (!AattacksDone || !BattacksDone)
 	{
-		pair<int, int> tempPair = GetNextPlayerAttack(playerIdToPlayNext, algo1.algo, algo2.algo); 
-		if (tempPair.first == AttckDoneIndex && (tempPair.second == AttckDoneIndex))
+		Coordinate tempPair = GetNextPlayerAttack(playerIdToPlayNext); 
+		if (tempPair.row == AttckDoneIndex && (tempPair.col == AttckDoneIndex) && (tempPair.depth == AttckDoneIndex))
 		{
 			switch (playerIdToPlayNext)
 			{
@@ -136,13 +135,15 @@ int GameManager::PlayGame()
 		else if (ValidAttackCor(tempPair))
 		{
 			//aligned both axis -1 because main board starts from (0,0)
-			tempPair = { tempPair.first - 1,tempPair.second - 1 };
+			tempPair.depth--;
+			tempPair.col--;
+			tempPair.row--;
 
-			char attckCell = mainGameBoard[tempPair.first][tempPair.second];
+			char attckCell = mainGameBoard.m_board[tempPair.row][tempPair.col][tempPair.depth];
 			bool isSelfAttack = GameBoardUtils::IsPlayerIdChar(playerIdToPlayNext, attckCell);
 
 			//calculate attack and update mainboard
-			AttackResult tempattackresult = GetAttackResult(tempPair, mainGameBoard, playerAboardDetails, playerBboardDetails);
+			AttackResult tempattackresult = GetAttackResult(tempPair, playerAboardDetails, playerBboardDetails);
 
 			string resultDesc;
 			switch (tempattackresult)
@@ -153,7 +154,7 @@ int GameManager::PlayGame()
 			default: ;
 			}
 
-			GameLogger.logFile << "Player " << playerIdToPlayNext << " attack in (" << tempPair.first << "," << tempPair.second << ") result: " << resultDesc << endl;
+			GameLogger.logFile << "Player " << playerIdToPlayNext << " attack in " << tempPair <<" result: " << resultDesc << endl;
 
 			//update players - Notify with values 1-10 and not 0-9
 			//algo1.algo->notifyOnAttackResult(playerIdToPlayNext, tempPair.first + 1, tempPair.second + 1, tempattackresult);
