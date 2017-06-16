@@ -81,6 +81,7 @@ std::ostream& operator<< (std::ostream & out, Coordinate const& data)
 
 int GameManager::PlayGame()
 {
+	GameLogger << "Starting Play Game " << game_id << endl;
 	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
 	ShipDetailsBoard playerBboardDetails(mainGameBoard, PlayerBID);
 
@@ -107,6 +108,7 @@ int GameManager::PlayGame()
 			default:;
 			}
 
+			GameLogger << "Attak done for player " << playerIdToPlayNext << " Flipping players" << endl;
 			// Flip players
 			playerIdToPlayNext = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
 		}
@@ -133,7 +135,7 @@ int GameManager::PlayGame()
 
 			GameLogger.logFile << "Player " << playerIdToPlayNext << " attack in " << tempPair <<" result: " << resultDesc << endl;
 
-			//update players - Notify with values 1-10 and not 0-9. Scope to delete cor  object in the end
+			//update players - Notify with values 1-10 and not 0-9. Scope to delete cor object in the end
 			{
 				Coordinate cor(tempPair.row + 1, tempPair.col + 1, tempPair.depth + 1);
 				algo_ptr1->notifyOnAttackResult(playerIdToPlayNext, cor, tempattackresult);

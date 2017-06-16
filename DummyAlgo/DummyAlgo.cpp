@@ -10,18 +10,14 @@
 * \return NaiveBattleshipGameAlgo initalized object - used for loading DLL
 */
 
-atomic<int> instance = -1;
 
 IBattleshipGameAlgo* GetAlgorithm()
 {
-	++instance;
-	return new DummyAlgo(4);
+	return new DummyAlgo();
 }
 
-DummyAlgo::DummyAlgo(int instancea)
+DummyAlgo::DummyAlgo()
 {
-	
-
 	stringstream fileName;
 	fileName << "C:\\Temp\\Foo1\\" << this_thread::get_id() << "_" << "DummyAlgo" << GetRandNum() << ".log";
 	GameBoardUtils::InitLogger(AlgoLogger, fileName.str());
@@ -46,6 +42,24 @@ int DummyAlgo::GetRandNum ()
 void DummyAlgo::setBoard(const BoardData& board)
 {
 	AlgoLogger << "Set Board: (" << board.rows() << ", " << board.cols() << ", " << board.depth() << ")" << endl;
+	PrintBoard(board);
+}
+
+void DummyAlgo::PrintBoard(const BoardData& board)
+{
+	for (int k = 0; k < board.depth(); ++k)
+	{
+		for (int i = 0; i < board.rows(); i++)
+		{
+			for (int j = 0; j < board.cols(); j++)
+			{
+				AlgoLogger << board.charAt(Coordinate(i, j, k));
+			}
+			AlgoLogger.logFile << endl;
+		}
+
+		AlgoLogger.logFile << endl;
+	}
 }
 
 void DummyAlgo::setPlayer(int player)
@@ -55,6 +69,7 @@ void DummyAlgo::setPlayer(int player)
 
 Coordinate DummyAlgo::attack()
 {
+	AlgoLogger << "Player attacking at (-1,-1,-1)" << endl;
 	return Coordinate(-1, -1, -1);
 }
 
