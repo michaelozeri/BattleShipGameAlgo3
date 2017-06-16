@@ -12,5 +12,5 @@ public:
 	static string GetCurrentWorkingDirectory();
 	static string GetFullPath(const string& relativePath);
 	static bool DirExists(const std::string& dirName_in);
-	static int GetAllFiles(const string& basePath, const string& filePattern, vector<string>& collection);
+	static int GetAllFiles(const string& basePath, const string& filePattern, vector<string>& collection, vector<string>* names = nullptr);
 };

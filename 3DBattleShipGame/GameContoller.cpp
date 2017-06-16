@@ -7,7 +7,6 @@
 
 GameContoller::GameContoller(Configuration& config): config(config)
 {
-
 }
 
 void GameContoller::RunSingleThread(int id)
@@ -127,9 +126,9 @@ int GameContoller::InitGameController()
 
 bool GameContoller::ConfigureDll()
 {
-	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", dll_paths);
+	int cnt = IFileDirectoryUtils::GetAllFiles(config.path, "*.dll", dll_paths, &dll_names);
 	MainLogger.logFile << "Found " << cnt << " Dll's" << endl;
-
+	
 	if (cnt < 2)
 	{
 		MainLogger.logFile << "Missing *.dll file. Found " << cnt << endl;
@@ -137,15 +136,25 @@ bool GameContoller::ConfigureDll()
 		return false;
 	}
 	
+	int index = 0;
 	for each (const string& dll in dll_paths)
 	{
 		DllAlgo tempAlgo;
-		bool result = tempAlgo.LoadDll(dll);
+		bool result = tempAlgo.LoadDll(dll, dll_names[index]);
 		if(result)
 		{
 			algos_factory.push_back(move(tempAlgo));
 		}
+		index++;
 	}
+
+	index = 0;
+	MainLogger << "===== Printing Factories=======" << endl;
+	for each (const DllAlgo& algo in algos_factory)
+	{
+		MainLogger << "Path: " << algo.path << " Name: " << algo.DllName << endl;
+	}
+	MainLogger << "========= End of factory content printing ==============" << endl;
 
 	if (algos_factory.size() < 2)
 	{

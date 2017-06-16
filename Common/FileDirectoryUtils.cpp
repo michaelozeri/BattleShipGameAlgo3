@@ -45,7 +45,7 @@ bool IFileDirectoryUtils::DirExists(const std::string& dirName_in)
 	return false;    // this is not a directory!
 }
 
-int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& filePattern, vector<string>& collection)
+int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& filePattern, vector<string>& collection, vector<string>* names)
 {
 	int counter = 0;
 	WIN32_FIND_DATAA fileData; //data struct for file
@@ -63,9 +63,22 @@ int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& fileP
 	}
 	do
 	{
-		string path = basePath + "\\" + fileData.cFileName;
+		string fileName = fileData.cFileName;
+		string path = basePath + "\\" + fileName;
 		MainLogger.logFile << "[GetAllFiles] File was found: " << path << endl;
 		collection.push_back(path);
+
+		if(names != nullptr)
+		{
+			string name;
+			size_t lastdot = fileName.find_last_of(".");
+			if (lastdot == std::string::npos) 
+				name = fileName;
+			else
+				name =  fileName.substr(0, lastdot);
+			names->push_back(name);
+		}
+
 		counter++;
 	} while (FindNextFileA(handle, &fileData)); // Notice: Unicode compatible version of FindNextFile
 

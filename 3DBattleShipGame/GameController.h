@@ -17,7 +17,10 @@ public:
 private:
 	Configuration& config;
 	vector<Board3D> board3_ds;
+	
 	vector<string> dll_paths;
+	vector<string> dll_names;
+
 	vector<DllAlgo> algos_factory;
 	queue<GameTask> m_taskList;
 	mutex task_mutex;

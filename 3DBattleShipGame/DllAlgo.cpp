@@ -4,9 +4,10 @@ DllAlgo::DllAlgo(): algo(nullptr)
 {
 }
 
-bool DllAlgo::LoadDll(const string& dllPath, bool isCreateInsance)
+bool DllAlgo::LoadDll(const string& dllPath, string dllName)
 {
 	path = string(dllPath);
+	DllName = dllName;
 
 	// Load dynamic library
 	HINSTANCE hDll = LoadLibraryA(path.c_str()); // Notice: Unicode compatible version of LoadLibrary
@@ -25,7 +26,8 @@ bool DllAlgo::LoadDll(const string& dllPath, bool isCreateInsance)
 
 	handle = { hDll, GetAlgorithmFunc };
 
-	if (isCreateInsance)
+	//TODO: Remove
+	if (false)
 	{
 		algo = GetAlgorithmFunc();
 

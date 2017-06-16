@@ -15,10 +15,12 @@ class DllAlgo
 public:
 	DllAlgo();
 	IBattleshipGameAlgo* algo;
-	bool LoadDll(const string& dllPath, bool isCreateInsance = false);
+	bool LoadDll(const string& dllPath, string dllName);
 	IBattleshipGameAlgo* GetAlgoInstance() const;
 	void Dispose() const;
-private:
 	string path;
+	string DllName;
+private:
+	
 	pair <HINSTANCE, GetAlgorithmFuncType> handle;
 };

@@ -131,6 +131,7 @@
     <ClCompile Include="GameManger.cpp" />
     <ClCompile Include="GameTask.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PlayerScoreInfo.cpp" />
     <ClCompile Include="ShipDetailsBoard.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="GameTask.h" />
     <ClInclude Include="IArgumentParser.h" />
     <ClInclude Include="IBattleshipGameAlgo.h" />
+    <ClInclude Include="PlayerScoreInfo.h" />
     <ClInclude Include="ShipDetailsBoard.h" />
   </ItemGroup>
   <ItemGroup>
