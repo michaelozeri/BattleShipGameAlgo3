@@ -35,7 +35,6 @@ void GameContoller::RunSingleThread(int id)
 			ss << currentThreadId << ": Element isn't null. TaskID: " << task.task_id << endl;
 			MainLogger.SyncPrint(ss);
 			RunSingleGame(task);
-			
 		}
 	} while (result);
 

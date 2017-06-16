@@ -229,7 +229,7 @@ void GameManager::GameManagerCleanup() const
 void GameManager::InitGameManagerLog()
 {
 	stringstream fileName;
-	fileName << "C:\\Temp\\Foo1\\" << this_thread::get_id() << "_" << game_id << ".log";
+	fileName << "C:\\Temp\\Foo1\\" << "GameManager_" << this_thread::get_id() << "_" << game_id << ".log";
 	GameBoardUtils::InitLogger(GameLogger, fileName.str());
 
 	GameLogger << "Starting Execution thread " << this_thread::get_id() << ". With game id: " << game_id << endl;

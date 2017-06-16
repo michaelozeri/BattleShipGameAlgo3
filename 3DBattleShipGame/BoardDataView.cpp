@@ -3,7 +3,10 @@
 
 BoardDataView::BoardDataView(Board3D board, int playerID) : board3_d_(move(board)), playerId(playerID)
 {
-	
+	// Set protected vars in base class
+	_cols = board.m_Cols;
+	_rows = board.m_Rows;
+	_depth = board.m_Depth;
 }
 
 char BoardDataView::charAt(Coordinate c) const

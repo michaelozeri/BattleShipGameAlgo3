@@ -1,21 +1,46 @@
 #include "DummyAlgo.h"
 #include "GameBoardUtils.h"
+#include <atomic>
+#include <ctime>
+#include <random>
+#include <windows.h>
 
 /**
 * \brief Return instance of NaiveBattleshipGameAlgo
 * \return NaiveBattleshipGameAlgo initalized object - used for loading DLL
 */
 
+atomic<int> instance = -1;
+
 IBattleshipGameAlgo* GetAlgorithm()
 {
-	return new DummyAlgo();
+	++instance;
+	return new DummyAlgo(4);
 }
 
-DummyAlgo::DummyAlgo()
+DummyAlgo::DummyAlgo(int instancea)
 {
+	
+
 	stringstream fileName;
-	fileName << "C:\\Temp\\Foo1\\" << this_thread::get_id() << "_" << "DummyAlgo" << ".log";
+	fileName << "C:\\Temp\\Foo1\\" << this_thread::get_id() << "_" << "DummyAlgo" << GetRandNum() << ".log";
 	GameBoardUtils::InitLogger(AlgoLogger, fileName.str());
+}
+
+int DummyAlgo::GetRandNum () 
+{
+	std::vector<int> v(100);
+
+	for (int j = 0; j<100; j++)
+	{
+		v[j] = j;
+	}
+
+	std::random_device rd;
+	std::mt19937 g(rd());
+
+	std::shuffle(v.begin(), v.end(), g);
+	return v[0];
 }
 
 void DummyAlgo::setBoard(const BoardData& board)

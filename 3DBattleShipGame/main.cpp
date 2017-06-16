@@ -6,6 +6,9 @@
 #include "IArgumentParser.h"
 #include "3DBoardLoader.h"
 #include "GameController.h"
+#include <ctime>
+#include <iterator>
+#include <random>
 
 Logger MainLogger;
 
@@ -17,7 +20,8 @@ int main(int argc, char* argv[])
 {
 	//RunTest();
 	//return 0;
-	GameBoardUtils::InitLogger(MainLogger, "GameManager.log");
+	
+	GameBoardUtils::InitLogger(MainLogger, "C:\\temp\\Foo1\\GameManager.log");
 
 	Configuration config;
 	IArgumentParser::ParseArguments(config, argc, argv);

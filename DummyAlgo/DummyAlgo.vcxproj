@@ -86,6 +86,9 @@
       <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions);ALGO_EXPORTS</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Common</AdditionalIncludeDirectories>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>C:\Users\mzaitler\Desktop\Distribute.bat</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

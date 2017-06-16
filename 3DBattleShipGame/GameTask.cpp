@@ -1,7 +1,6 @@
 #include "GameTask.h"
 #include "GameManager.h"
 
-
 GameTask::GameTask(): index1(0), index2(0), task_id(0), m_gameBoard()
 {
 }
