@@ -141,6 +141,7 @@
     <ClInclude Include="DllAlgo.h" />
     <ClInclude Include="GameController.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameResultInfo.h" />
     <ClInclude Include="GameTask.h" />
     <ClInclude Include="IArgumentParser.h" />
     <ClInclude Include="IBattleshipGameAlgo.h" />

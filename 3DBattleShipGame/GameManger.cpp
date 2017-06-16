@@ -4,6 +4,7 @@
 #include "GameBoardUtils.h"
 #include "ShipDetailsBoard.h"
 #include "Board3D.h"
+#include "GameResultInfo.h"
 
 GameManager::GameManager(unique_ptr<IBattleshipGameAlgo> algo1, unique_ptr<IBattleshipGameAlgo> algo2, Board3D board, int id) :
 	view1(board, PlayerAID), view2(board, PlayerBID), game_id(id),
@@ -54,11 +55,12 @@ AttackResult GameManager::GetAttackResult(const Coordinate& pair, ShipDetailsBoa
 	return GameBoardUtils::IsPlayerIdChar(PlayerAID, mainGameBoard.m_board[pair.row][pair.col][pair.depth]) ? detailsA.GetAttackResult(pair) : detailsB.GetAttackResult(pair);
 }
 
-void GameManager::PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playerB)
+pair<int, int> GameManager::PrintPoints(ShipDetailsBoard& playerA, ShipDetailsBoard& playerB)
 {
 	GameLogger << "Points:" << endl;
 	GameLogger << "Player A: " << playerB.negativeScore << endl;
 	GameLogger << "Player B: " << playerA.negativeScore << endl;
+	return{ playerB.negativeScore, playerA.negativeScore };
 }
 
 bool GameManager::IsPlayerWon(int currentPlayer, ShipDetailsBoard& detailsA, ShipDetailsBoard& detailsB)
@@ -79,7 +81,7 @@ std::ostream& operator<< (std::ostream & out, Coordinate const& data)
 	return out;
 }
 
-int GameManager::PlayGame()
+GameResultInfo GameManager::PlayGame()
 {
 	GameLogger << "Starting Play Game " << game_id << endl;
 	ShipDetailsBoard playerAboardDetails(mainGameBoard, PlayerAID);
@@ -151,14 +153,15 @@ int GameManager::PlayGame()
 			if (IsPlayerWon(PlayerAID, playerAboardDetails, playerBboardDetails))
 			{
 				GameLogger << "Player A won" << endl;
-				PrintPoints(playerAboardDetails, playerBboardDetails);
-				return 0;
+				pair<int, int> points = PrintPoints(playerAboardDetails, playerBboardDetails);
+				return GameResultInfo(PlayerAWinner, points.first, points.second);
 			}
 			if (IsPlayerWon(PlayerBID, playerAboardDetails, playerBboardDetails))
 			{
 				GameLogger << "Player B won" << endl;
-				PrintPoints(playerAboardDetails, playerBboardDetails);
-				return 0;
+				pair<int, int> points = PrintPoints(playerAboardDetails, playerBboardDetails);
+				return GameResultInfo(PlayerBWinner, points.first, points.second);
+
 			}
 		}
 		else
@@ -168,8 +171,8 @@ int GameManager::PlayGame()
 			playerIdToPlayNext = (playerIdToPlayNext == PlayerAID) ? PlayerBID : PlayerAID;
 		}
 	}
-	PrintPoints(playerAboardDetails, playerBboardDetails);
-	return 0;
+	pair<int,int> points = PrintPoints(playerAboardDetails, playerBboardDetails);
+	return GameResultInfo(NoWinner, points.first, points.second);
 }
 
 void GameManager::InitGameManagerLog()
@@ -184,19 +187,19 @@ void GameManager::InitGameManagerLog()
 	mainGameBoard.PrintBoard(GameLogger.logFile);
  }
 
-int GameManager::RunGame()
+GameResultInfo GameManager::RunGame()
 {
 	InitGameManagerLog();
 
 	int code = GameInitializer();
-	if(code == ErrorExitCode)
+	if (code == ErrorExitCode)
 	{
-		return code;
+		return GameResultInfo(NoWinner, 0, 0);
 	}
 	GameLogger.logFile << "===== Game Initilized =======" << endl;
-	
-	code = PlayGame();
-	
+
+	GameResultInfo resultInfo = PlayGame();
+
 	GameLogger.logFile << "Game exit code is " << code << endl;
-	return code;
+	return resultInfo;
 }

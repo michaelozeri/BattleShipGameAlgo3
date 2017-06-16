@@ -83,5 +83,8 @@
     <ClInclude Include="BoardDataView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GameResultInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

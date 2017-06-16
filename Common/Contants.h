@@ -44,6 +44,11 @@ enum class BoardFileErrorCode {Success, UnknownError};
 #define SubmarineB 'm'
 #define DestroyerB 'd'
 
+// Winners constants
+#define PlayerAWinner PlayerAID
+#define PlayerBWinner PlayerBID
+#define NoWinner -1
+
 // Ships wights
 #define RubberBoatW 1
 #define RocketShipW 2
