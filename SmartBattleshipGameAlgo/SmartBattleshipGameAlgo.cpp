@@ -18,10 +18,10 @@ SmartBattleshipGameAlgo::SmartBattleshipGameAlgo(): m_numRows(0), m_numCols(0), 
 Coordinate SmartBattleshipGameAlgo::attack()
 {
 	// create new coordinate - attackCoor
-	Coordinate attackCoor(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
 	// if we are at RandomMode:
-	if (m_mode == AttackMode::RandomMode) {
-		attackCoor = AllignCord(GetValidRandomAttack());
+	if (m_mode == AttackMode::RandomMode)
+	{
+		Coordinate attackCoor = AllignCord(GetValidRandomAttack());
 		return attackCoor;
 	}
 	
