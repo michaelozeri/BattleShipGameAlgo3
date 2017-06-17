@@ -76,11 +76,16 @@ Coordinate DummyAlgo::attack()
 {
 	Coordinate c(-1, -1, -1);
 	bool isCountinue = true;
-	for(int k = depth; k<_board->depth(); ++k)
+
+	int k = depth;
+	int i = row;
+	int j = col;
+
+	for(; k<_board->depth(); ++k)
 	{
-		for (int i = row; i < _board->rows(); ++i)
+		for (; i < _board->rows(); ++i)
 		{
-			for (int j = col; j < _board->cols(); ++j)
+			for (; j < _board->cols(); ++j)
 			{
 				if(!isCountinue)
 				{
@@ -95,7 +100,9 @@ Coordinate DummyAlgo::attack()
 					c = Coordinate(i + 1, j + 1, k + 1);
 				}
 			}
+			j = 0;
 		}
+		i = 0;
 	}
 	row = _board->rows(); col = _board->cols(); depth = _board->depth();
 	AlgoLogger << "Attacking on " << c.row << " " << c.col << " " << c.depth << endl;
