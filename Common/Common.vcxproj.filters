@@ -32,9 +32,6 @@
     <ClInclude Include="IFileDirectoryUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IBattleshipGameAlgo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameBoardUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>

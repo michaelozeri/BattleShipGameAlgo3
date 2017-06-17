@@ -1,7 +1,8 @@
 #pragma once
-#include "IBattleshipGameAlgo.h"
 #include <vector>
 #include <tuple>
+#include "IBattleshipGameAlgo.h"
+#include "Board3D.h"
 
 using namespace std;
 
@@ -21,7 +22,7 @@ public:
 	void notifyOnAttackResult(int player, Coordinate move, AttackResult result) override; // notify on last move result
 	void setPlayer(int player) override;
 	
-
+	SmartBattleshipGameAlgo();
 
 	Coordinate AllignCord(Coordinate currCoor, bool isNegative = false);
 	//static pair<int, int> AllignCord(const pair<int, int>& pair, bool isNegative = false);

@@ -73,37 +73,6 @@ void GameBoardUtils::DeleteBoard(char** board, int rows) {
 	delete[] board;
 }
 
-/*
-BoardFileErrorCode GameBoardUtils::LoadBoardFromFile(char** board, int rows, int cols, const string& filePath) 
-{
-	//set all board to blank
-	InitBoard(board, rows, cols);
-
-	FileReader fileReader(filePath);
-
-	int row = 0;
-	while (!fileReader.IsEof() && row < rows)
-	{
-		string line;
-		fileReader.ReadLine(line);
-		LoadLineToBoard(board, row, cols, line);
-		row++;
-	}
-
-	fileReader.CloseFile();
-	
-	// Clone current board, becaue ValidateGameBoard changed the board
-	char** cloneBoard = GameBoardUtils::InitializeNewEmptyBoard(rows,cols);
-	GameBoardUtils::CloneBoard(board, cloneBoard,rows,cols);
-	BoardFileErrorCode errcode = ValidateGameBoard(cloneBoard, rows, cols);
-
-	// Delete clone board
-	DeleteBoard(cloneBoard,rows);
-
-	return errcode;
-}
-*/
-
 void GameBoardUtils::PrintBoard(ostream& stream, vector<vector<vector<char>>> board, int rows, int cols,int depth) 
 {
 	for (int k = 0; k < depth; k++)
@@ -142,65 +111,6 @@ void GameBoardUtils::CloneBoard(char** full_board, char** player_board, int rows
 		for (size_t j = 0; j < cols; j++)
 		{
 			player_board[i][j] = full_board[i][j];
-		}
-	}
-}
-
-// this function mark all the places on the board 
-void GameBoardUtils::MarkCannotAttack(int playernum, Board3D& mainBoard, int rows, int cols, int depth) {
-
-	char cannotAttckChar = CannotAttck;
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			for (int k = 0; k < depth; k++) {
-				// if the char matches our player, then we mark all the 
-				// places around it with CannotAttack char ('N')
-				if (IsPlayerIdChar(playernum, mainBoard.m_board[i][j][k]))
-				{
-					// mark me
-					mainBoard.m_board[i][j][k] = cannotAttckChar;
-					//mark col-1
-					if ((j > 0) && (!IsPlayerIdChar(playernum, mainBoard.m_board[i][j - 1][k])))
-					{
-						mainBoard.m_board[i][j - 1][k] = cannotAttckChar;
-					}
-					//mark col+1
-					if ((j < cols - 1) && (!IsPlayerIdChar(playernum, mainBoard.m_board[i][j + 1][k])))
-					{
-						mainBoard.m_board[i][j + 1][k] = cannotAttckChar;
-					}
-					//mark row-1
-					if ((i > 0) && (!IsPlayerIdChar(playernum, mainBoard.m_board[i - 1][j][k])))
-					{
-						mainBoard.m_board[i - 1][j][k] = cannotAttckChar;
-					}
-					//mark row+1
-					if ((i < rows - 1) && (!IsPlayerIdChar(playernum, mainBoard.m_board[i + 1][j][k])))
-					{
-						mainBoard.m_board[i + 1][j][k] = cannotAttckChar;
-					}
-					// mark depth-1
-					if ((k > 0) && (!IsPlayerIdChar(playernum, mainBoard.m_board[i][j][k - 1])))
-					{
-						mainBoard.m_board[i][j][k - 1] = cannotAttckChar;
-					}
-					//mark depth+1
-					if ((k < depth - 1) && (!IsPlayerIdChar(playernum, mainBoard.m_board[i][j][k + 1])))
-					{
-						mainBoard.m_board[i][j][k + 1] = cannotAttckChar;
-					}
-				}
-			}
-		}
-	}
-	// mark all places at the board where we can hit with 'Y' (CanAttack)
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			for (int k = 0; k < depth; k++) {
-				if (!(mainBoard.m_board[i][j][k] == cannotAttckChar)) {
-					mainBoard.m_board[i][j][k] = CanAttck;
-				}
-			}
 		}
 	}
 }

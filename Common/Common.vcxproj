@@ -122,7 +122,6 @@
     <ClInclude Include="Bonus.h" />
     <ClInclude Include="Contants.h" />
     <ClInclude Include="GameBoardUtils.h" />
-    <ClInclude Include="IBattleshipGameAlgo.h" />
     <ClInclude Include="IFileDirectoryUtils.h" />
     <ClInclude Include="IOLib.h" />
   </ItemGroup>

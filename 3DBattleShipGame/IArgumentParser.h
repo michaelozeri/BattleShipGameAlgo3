@@ -1,5 +1,6 @@
 #pragma once
 #include "Bonus.h"
+#include <string>
 
 using namespace std;
 class Configuration

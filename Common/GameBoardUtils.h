@@ -1,10 +1,7 @@
 #pragma once
 
-#include "Contants.h"
-#include <thread>
 #include "IOLib.h"
 #include <vector>
-#include "../3DBattleShipGame/Board3D.h"
 
 using namespace std;
 
@@ -21,11 +18,9 @@ public:
 	static void LoadLineToBoard(vector<vector<vector<char>>>& borad3D, int row, int depth, int numOfcols, const string& cs);
 	static char** InitializeNewEmptyBoard(int rows, int cols);
 	static void DeleteBoard(char** board, int rows);
-	static BoardFileErrorCode LoadBoardFromFile(char** board, int rows, int cols, const string& filePath);
 	static void PrintBoard(ostream& stream, vector<vector<vector<char>>> board, int rows, int cols, int depth);
 	static void CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols,bool copyAllChars = false);
 	static void CloneBoard(char** full_board, char** player_board, int rows, int cols);
-	static void MarkCannotAttack(int playernum, Board3D& mainBoard, int rows, int cols, int depth);
 	static string GetFilePathBySuffix(int argc, string customPath, string filesuffix, bool direxists = true);
 	static bool DirExists(const std::string& dirName_in);
 	static char** ClonePlayerBoard(const char** fullBoard, int i, int rows, int cols);

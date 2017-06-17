@@ -1,14 +1,18 @@
 #include "SmartBattleshipGameAlgo.h"
-#include "../Common/GameBoardUtils.h"
+#include "GameBoardUtils.h"
 #include <cassert>
-#include <algorithm>
 #include <vector>     
 #include <cstdlib>
+#include "SmartBoardUtils.h"
 
 Logger MainLogger;
 
 void SmartBattleshipGameAlgo::setPlayer(int player) {
 	m_myPlayerNum = player;
+}
+
+SmartBattleshipGameAlgo::SmartBattleshipGameAlgo(): m_numRows(0), m_numCols(0), m_depth(0), m_mode(), m_currDir(), m_myPlayerNum(0)
+{
 }
 
 Coordinate SmartBattleshipGameAlgo::attack()
@@ -325,9 +329,9 @@ void SmartBattleshipGameAlgo::setBoard(const BoardData& board)
 	MainLogger.InitLogger("SmartAlgo.log");
 
 	// getting fields of board from BoardData.
-	m_numRows = board.rows;
-	m_numCols = board.cols;
-	m_depth = board.depth;
+	m_numRows = board.rows();
+	m_numCols = board.cols();
+	m_depth = board.depth();
 	
 	m_mode = AttackMode::RandomMode; // Starting from random mode
 
@@ -335,7 +339,7 @@ void SmartBattleshipGameAlgo::setBoard(const BoardData& board)
 	m_Board3d = Board3D(m_numRows, m_numCols, m_depth);
 
 	// mark on m_Board Y if we can strike and N if we can't
-	GameBoardUtils::MarkCannotAttack(m_myPlayerNum, m_Board3d, m_numRows, m_numCols, m_depth);
+	SmartBoardUtils::MarkCannotAttack(m_myPlayerNum, m_Board3d, m_numRows, m_numCols, m_depth);
 	
 	// move on the board and inserting the relevant attack 
 	// coordinates to the vector m_attacksRemain
@@ -392,7 +396,6 @@ int SmartBattleshipGameAlgo::GetRandom(size_t maxNumber)
 {
 	return rand() % maxNumber;
 }
-
 
 // this function start a random attack
 void SmartBattleshipGameAlgo::StartRandomAttackMode()

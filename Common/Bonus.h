@@ -1,7 +1,6 @@
 #pragma once
 #include <windows.h>
 #include <wincon.h>
-#include "IOLib.h"
 
 enum class RetVal { Success, UnknownError };
 

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string> // Actually not required here - but here due to students' request
-#include "../3DBattleShipGame/Board3D.h"
-#include "../Common/Contants.h"
+//Smart
 /*Notice:
 * Usually it is bad practice to have several classes/structs in the same header.
 * Here we use this practice only for simplicity considerations,
