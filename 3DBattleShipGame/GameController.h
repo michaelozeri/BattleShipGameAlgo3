@@ -13,8 +13,6 @@ class GameContoller
 {
 public:
 	GameContoller(Configuration& config);
-	void RunSingleThread(int id);
-	void PrintGameQueue();
 	void RunApplication();
 
 private:
@@ -47,4 +45,7 @@ private:
 	void ReportManager();
 	void FillElementFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId, int elementsToExtract) ;
 	void FillAllElementsFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId);
+
+	void RunSingleThread(int id);
+
 };
