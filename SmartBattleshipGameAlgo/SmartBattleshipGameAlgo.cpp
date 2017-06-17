@@ -21,17 +21,24 @@ Coordinate SmartBattleshipGameAlgo::attack()
 	Coordinate attackCoor(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
 	// if we are at RandomMode:
 	if (m_mode == AttackMode::RandomMode) {
-		attackCoor = AllignCord(GetValidRandomAttack());
-		return attackCoor;
+		attackCoor = GetValidRandomAttack();
+		if (attackCoor.row == AttckDoneIndex) {
+			return attackCoor;
+		}
+		return AllignCord(attackCoor);
 	}
 	
 	// if we're at Target Mode
-	Coordinate attackCoor = GetValidOptionalAttack();
+	attackCoor = GetValidOptionalAttack();
 	if(attackCoor.row == AttckDoneIndex)
 	{
 		// Return to random state
 		StartRandomAttackMode();
-		return AllignCord(GetValidRandomAttack());
+		attackCoor = GetValidRandomAttack();
+		if (attackCoor.row == AttckDoneIndex) {
+			return attackCoor;
+		}
+		return AllignCord(attackCoor);
 	}
 	return AllignCord(attackCoor);
 }
@@ -42,7 +49,7 @@ Coordinate SmartBattleshipGameAlgo::GetValidRandomAttack ()
 	while (m_attacksRemain.size() > 0)
 	{
 		int randomLocation = GetRandom(m_attacksRemain.size());
-		Coordinate currAttack = m_attacksRemain[randomLocation];
+		currAttack = m_attacksRemain[randomLocation];
 
 		if (!IsAttackValid(currAttack.row, currAttack.col, currAttack.depth))
 		{
