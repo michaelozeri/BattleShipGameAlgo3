@@ -339,7 +339,9 @@ void SmartBattleshipGameAlgo::setBoard(const BoardData& board)
 	m_numRows = board.rows();
 	m_numCols = board.cols();
 	m_depth = board.depth();
-	
+	m_attacksRemain.clear();
+	StartRandomAttackMode();
+
 	m_mode = AttackMode::RandomMode; // Starting from random mode
 
 	// creating a Board3D for the smart player, all is BLANK
