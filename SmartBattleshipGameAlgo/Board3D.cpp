@@ -65,9 +65,3 @@ char Board3D::ChatAt(Coordinate& cor) const
 
 	return m_board[cor.row][cor.col][cor.depth];
 }
-
-Board3D::~Board3D()
-{
-	//cout << "In dtor" << endl;
-	//MainLogger.logFile << "In dtor" << endl;
-}

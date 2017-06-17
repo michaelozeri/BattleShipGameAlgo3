@@ -16,7 +16,6 @@ public:
 	Board3D();
 	void PrintBoard(ostream& stream) const;
 	char ChatAt(Coordinate& cor) const;
-	~Board3D();
 private:
 	void AllocateVectorSizes();
 	void SetInitialChar(char initialChar = BLANK);

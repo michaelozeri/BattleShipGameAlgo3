@@ -16,7 +16,7 @@ IBattleshipGameAlgo* GetAlgorithm()
 	return new DummyAlgo();
 }
 
-DummyAlgo::DummyAlgo()
+DummyAlgo::DummyAlgo(): row(0), col(0), depth(0), _board(nullptr)
 {
 	stringstream fileName;
 	fileName << "C:\\Temp\\Foo1\\" << this_thread::get_id() << "_" << "DummyAlgo" << GetRandNum() << ".log";
@@ -41,6 +41,10 @@ int DummyAlgo::GetRandNum ()
 
 void DummyAlgo::setBoard(const BoardData& board)
 {
+	row = 0;
+	col = 0;
+	depth = 0;
+	_board = &board;
 	AlgoLogger << "Set Board: (" << board.rows() << ", " << board.cols() << ", " << board.depth() << ")" << endl;
 	PrintBoard(board);
 }
@@ -65,12 +69,37 @@ void DummyAlgo::PrintBoard(const BoardData& board)
 void DummyAlgo::setPlayer(int player)
 {
 	AlgoLogger << "Set Player " << player << endl;
+	_PlayerId = player;
 }
 
 Coordinate DummyAlgo::attack()
 {
-	AlgoLogger << "Player attacking at (-1,-1,-1)" << endl;
-	return Coordinate(-1, -1, -1);
+	Coordinate c(-1, -1, -1);
+	bool isCountinue = true;
+	for(int k = depth; k<_board->depth(); ++k)
+	{
+		for (int i = row; i < _board->rows(); ++i)
+		{
+			for (int j = col; j < _board->cols(); ++j)
+			{
+				if(!isCountinue)
+				{
+					row = i; col = j; depth = k;
+					AlgoLogger << "Attacking on " << c.row << " " << c.col << " " << c.depth << endl;
+					return c;
+				}
+				c = Coordinate(i, j, k);
+				if (!GameBoardUtils::IsPlayerIdChar(_PlayerId, _board->charAt(c)))
+				{
+					isCountinue = false;
+					c = Coordinate(i + 1, j + 1, k + 1);
+				}
+			}
+		}
+	}
+	row = _board->rows(); col = _board->cols(); depth = _board->depth();
+	AlgoLogger << "Attacking on " << c.row << " " << c.col << " " << c.depth << endl;
+	return c;
 }
 
 std::ostream& operator<< (std::ostream & out, AttackResult const& data)

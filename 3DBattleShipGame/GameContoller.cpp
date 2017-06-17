@@ -61,7 +61,7 @@ void GameContoller::RunSingleGame(GameTask& gameTask)
 	PlayerResultElement playerAScore(result.Winner == PlayerAWinner, result.Winner == PlayerBWinner, result.Points_PlayerA, result.Points_PlayerB, gameTask.index1);
 	PlayerResultElement playerBScore(result.Winner == PlayerBWinner, result.Winner == PlayerAWinner, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2);
 	{
-		lock_guard<mutex>  lg(result_mutex_);
+		lock_guard<mutex>  lg(result_mutex_); 
 		results[gameTask.index1].push(playerAScore);
 		results[gameTask.index2].push(playerBScore);
 
@@ -84,7 +84,7 @@ void GameContoller::RunSingleGame(GameTask& gameTask)
 bool GameContoller::GetTaskElement(GameTask& task)
 {
 	std::lock_guard<std::mutex> guard(task_mutex);
-	cout << m_taskList.size() << endl;
+	//cout << m_taskList.size() << endl;
 	if (!m_taskList.empty())
 	{
 		task = (move(m_taskList.front()));
@@ -189,10 +189,8 @@ void GameContoller::RunApplication()
 	PrintGameControllerInfo();
 
 	MainLogger.logFile << "Starting filling task queue" << endl;
-	result = GenerateGameQueue();
+	result = GenerateGameQueue(); 
 	MainLogger.logFile << "Successfully GenerateGameQueue" << endl;
-
-	PrintGameQueue();
 
 	int id = 0;
 	vector<thread> threads(config.thread_num);

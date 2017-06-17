@@ -21,7 +21,6 @@ public:
 	static void PrintBoard(ostream& stream, vector<vector<vector<char>>> board, int rows, int cols, int depth);
 	static void CloneBoardToPlayer(const char** full_board, int playerID, char** player_board, int rows, int cols,bool copyAllChars = false);
 	static void CloneBoard(char** full_board, char** player_board, int rows, int cols);
-	static string GetFilePathBySuffix(int argc, string customPath, string filesuffix, bool direxists = true);
 	static bool DirExists(const std::string& dirName_in);
 	static char** ClonePlayerBoard(const char** fullBoard, int i, int rows, int cols);
 	static void ChangeFontSize();
