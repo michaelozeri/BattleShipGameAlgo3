@@ -21,7 +21,9 @@ public:
 	void notifyOnAttackResult(int player, Coordinate move, AttackResult result) override; // notify on last move result
 	void setPlayer(int player) override;
 	
-	Coordinate AllignCord(Coordinate& currCoor, bool isNegative = false);
+
+
+	Coordinate AllignCord(Coordinate currCoor, bool isNegative = false);
 	//static pair<int, int> AllignCord(const pair<int, int>& pair, bool isNegative = false);
 	
 	Coordinate GetValidRandomAttack();
@@ -64,8 +66,6 @@ public:
 	//TODO - why const? makes problem with lvalue for board3d.m_board...
 	void MarkSinkBattleAroundAsInvlid(int row, int col, int depth);
 	//void MarkSinkBattleAroundAsInvlid(int row, int col) const;
-
-	~SmartBattleshipGameAlgo();
 	
 
 private:

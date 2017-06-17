@@ -13,8 +13,9 @@ void SmartBattleshipGameAlgo::setPlayer(int player) {
 
 Coordinate SmartBattleshipGameAlgo::attack()
 {
+	// create new coordinate - attackCoor
 	Coordinate attackCoor(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
-	// if we are at RandomMode
+	// if we are at RandomMode:
 	if (m_mode == AttackMode::RandomMode) {
 		attackCoor = AllignCord(GetValidRandomAttack());
 		return attackCoor;
@@ -36,7 +37,6 @@ Coordinate SmartBattleshipGameAlgo::GetValidRandomAttack ()
 	Coordinate currAttack(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
 	while (m_attacksRemain.size() > 0)
 	{
-		
 		int randomLocation = GetRandom(m_attacksRemain.size());
 		Coordinate currAttack = m_attacksRemain[randomLocation];
 
@@ -241,6 +241,7 @@ void SmartBattleshipGameAlgo::HandleMyTargetMode(int row, int col, int depth, At
 	}
 }
 
+// 
 void SmartBattleshipGameAlgo::HandleMyAttackResult(int row, int col, int depth, AttackResult result)
 {
 	switch (m_mode)
@@ -282,30 +283,36 @@ void SmartBattleshipGameAlgo::MarkInvalidCell(int row, int col, int depth, Attac
 		// first markvalue gets 'S'.
 		markValue = CannotAttackShip;
 		// then we mark the places around the ship
+		// (because if there was a ship there, there can't be another besides it)
 		MarkSinkBattleAroundAsInvlid(row, col, depth);
 		break;
 	}
 	m_Board3d.m_board[row][col][depth] = markValue;
 }
 
+// this function is operated when we successfully sank the opponent ship
 void SmartBattleshipGameAlgo::MarkSinkBattleAroundAsInvlid(int row, int col, int depth)
 {
 	// if we're out of bound somehow...
 	if (row < 0 || row >= m_numRows || col < 0 || col >= m_numCols || depth < 0 || depth >= m_depth) {
 		return;
 	}
-		
+	
+	// we take the curCell...
+	// then we mark him as CannotAttack
 	char curCell = m_Board3d.m_board[row][col][depth];
 	m_Board3d.m_board[row][col][depth] = CannotAttck;
 
-	if (curCell == CannotAttackShip)
-	{
+	// now we check if curCell is CannotattackShip, if it so, it means there was 
+	// an opponent's ship there, so we need to operate recursivly the function on all
+	// the points around it...
+	if (curCell == CannotAttackShip) {
 		MarkSinkBattleAroundAsInvlid(row - 1, col, depth);
 		MarkSinkBattleAroundAsInvlid(row + 1, col, depth);
 		MarkSinkBattleAroundAsInvlid(row, col - 1, depth);
 		MarkSinkBattleAroundAsInvlid(row, col + 1, depth);
 		MarkSinkBattleAroundAsInvlid(row, col, depth - 1);
-		MarkSinkBattleAroundAsInvlid(row, col, depth +1);
+		MarkSinkBattleAroundAsInvlid(row, col, depth + 1);
 	}
 }
 
@@ -328,8 +335,6 @@ void SmartBattleshipGameAlgo::setBoard(const BoardData& board)
 	m_Board3d = Board3D(m_numRows, m_numCols, m_depth);
 
 	// mark on m_Board Y if we can strike and N if we can't
-
-	// TODO - fix markcannotattack
 	GameBoardUtils::MarkCannotAttack(m_myPlayerNum, m_Board3d, m_numRows, m_numCols, m_depth);
 	
 	// move on the board and inserting the relevant attack 
@@ -343,15 +348,16 @@ void SmartBattleshipGameAlgo::setBoard(const BoardData& board)
 				if (m_Board3d.m_board[i][j][k] == CanAttck) { // if we can attak the spot.
 					// creating new coordinate and
 					// insert it to the vector of attacks
-					Coordinate potentialAttackCore(i, j, k);
-					m_attacksRemain.push_back(potentialAttackCore);
+					Coordinate AttackCore(i, j, k);
+					m_attacksRemain.push_back(AttackCore);
 				}
 			}
 		}
 	}
 }
 
-Coordinate SmartBattleshipGameAlgo::AllignCord(Coordinate& currCoor, bool isNegative)
+// this function "fixes" the coordinates it gets
+Coordinate SmartBattleshipGameAlgo::AllignCord(Coordinate currCoor, bool isNegative)
 {
 	if (currCoor.row != AttckDoneIndex && currCoor.col != AttckDoneIndex && currCoor.depth != AttckDoneIndex)
 	{
@@ -378,13 +384,6 @@ void SmartBattleshipGameAlgo::notifyOnAttackResult(int player, Coordinate move, 
 	{
 		HandleRivalAttackResult(currCoor.row, currCoor.col, currCoor.depth, result);
 	}
-}
-
-SmartBattleshipGameAlgo::~SmartBattleshipGameAlgo()
-{
-	GameBoardUtils::DeleteBoard(m_board,m_NumRow);
-	GameBoardUtils::DeleteBoard(m_cannotAttackBoard,m_NumRow);
-	MainLogger.LoggerDispose();
 }
 
 
