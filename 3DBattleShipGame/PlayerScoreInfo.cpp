@@ -11,19 +11,21 @@ PlayerScoreInfo::PlayerScoreInfo(int playerId, std::string name): PlayerId(playe
 	Name = move(name);
 }
 
-void PlayerScoreUtils::UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement> elementsToUpdate)
+void PlayerScoreUtils::UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement> elementsToUpdate, ostream& out)
 {
 	for each (const PlayerResultElement& elem in elementsToUpdate)
 	{
 		PlayerScoreInfo& currentPlayer = scores[elem.PlayerId];
 		currentPlayer.GamePlayed++;
 		currentPlayer.Wins += elem.IsWon ? 1 : 0;
-		currentPlayer.Losses += elem.IsWon ? 0 : 1;
+		currentPlayer.Losses += elem.IsLoss ? 1 : 0;
 		currentPlayer.PtsFor += elem.PtsFor;
 		currentPlayer.PtsAgainst += elem.PtsAgainst;
 	}
 
 	PrintScores(cout, scores);
+	PrintScores(out, scores);
+
 }
 
 void PlayerScoreUtils::PrintScores(ostream& out, const vector<PlayerScoreInfo>& scores)
@@ -45,10 +47,22 @@ void PlayerScoreUtils::PrintSingleScore(ostream& out, const PlayerScoreInfo& sco
 	out << left << setw(NameW) << score.Name;
 	out << left << setw(WinsW) << score.Wins;
 	out << left << setw(LossesW) << score.Losses;
-	out << left << setw(PercentageW) << 50;
+
+	//ToDo - fix that in case of '5' will be printet 5 and not 5.00
+	out << left << setw(PercentageW) << std::setprecision(2) << std::fixed << GeneratePrecentageString(score);
 	out << left << setw(PtsForW) << score.PtsFor;
 	out << left << setw(PtsAgainst) << score.PtsAgainst;
 	out << endl;
+}
+
+double PlayerScoreUtils::GeneratePrecentageString(const PlayerScoreInfo& score)
+{
+	double sum = score.Wins + score.Losses;
+	if (sum == 0)
+		return 0;
+
+	double wins = score.Wins; 
+	return (wins / sum)*100;
 }
 
 void PlayerScoreUtils::PrintStartLine(ostream& out)

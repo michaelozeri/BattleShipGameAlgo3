@@ -8,7 +8,7 @@
 
 #define ROWS 10
 #define COLS 10
-#define BLANK '*'
+#define BLANK ' '
 #define HIT_CHAR '#'
 #define SINK_CHAR '@'
 
@@ -18,7 +18,7 @@
 #define AttckDoneIndex -1
 
 // Attack Flags Special Flags
-//Y - yes means we can attack here. 'N' means not 
+//Y - yes means we can attack here. 'N' means not
 #define CanAttck 'Y'
 #define CannotAttck 'N'
 

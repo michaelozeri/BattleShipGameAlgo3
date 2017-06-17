@@ -46,4 +46,5 @@ private:
 	bool GetTaskElement(GameTask& task);
 	void ReportManager();
 	void FillElementFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId, int elementsToExtract) ;
+	void FillAllElementsFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId);
 };

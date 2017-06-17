@@ -91,9 +91,8 @@ bool BoardLoader::LoadBoardFromPath(const string& path) const
 	return result;
 }
 
-bool BoardLoader::ValidateBoard(Board3D& boardToValidate) const
+bool BoardLoader::ValidateBoard(Board3D& boardToValidate)
 {
-	return true;
 	return BoardValidator::ValidateBoard(boardToValidate, MainLogger);
 }
 

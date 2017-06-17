@@ -59,6 +59,10 @@ void Board3D::PrintBoard(ostream& stream) const
 
 char Board3D::ChatAt(Coordinate& cor) const
 {
+	// Check validity of cor
+	if (cor.row < 0 || cor.row >= m_Rows || cor.col < 0 || cor.col >= m_Cols || cor.depth < 0 || cor.depth >= m_Depth)
+		return BLANK;
+
 	return m_board[cor.row][cor.col][cor.depth];
 }
 

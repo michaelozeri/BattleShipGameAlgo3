@@ -1,4 +1,5 @@
 #include "BoardValidator.h"
+#include "IFileDirectoryUtils.h"
 
 bool IsPlayerIdChar(int playerID, char current) {
 	if (playerID == PlayerAID)
@@ -48,7 +49,7 @@ int GetBoatTypeSizeFromChar(char type)
 *direction 1 = check to the right
 *direction 0 = check down
 */
-bool CheckShipSize(vector<vector<vector<char>>> board, int direction, int i, int j, int k, char charType, int rows, int cols, int depth)
+bool CheckShipSize(vector<vector<vector<char>>>& board, int direction, int i, int j, int k, char charType, int rows, int cols, int depth)
 {
 	int boardTypeSize = GetBoatTypeSizeFromChar(charType);
 	int sizecheck = boardTypeSize - 1;
@@ -205,10 +206,10 @@ bool MarkAllBoat(vector<vector<vector<char>>>& board, int i, int j, int k, char 
 void GetWrongSizeErrMessage(char type, int player)
 {
 	char playerChar = player == PlayerAID ? 'A' : 'B';
-	printf("Wrong size or shape for ship %c for player %c\n", type, playerChar);
+	MainLogger << "Wrong size or shape for ship " << type << " for player " << playerChar << endl;
 }
 
-bool BoardValidator::ValidateBoard(Board3D& boardToValidate, Logger& mainLogger)
+bool BoardValidator::ValidateBoard(Board3D boardToValidate, Logger& mainLogger)
 {
 	int playerAboatNum = 0; // Holds valid boat num from player A
 	int playerBboatNum = 0; // Holds valid boat num from player B
@@ -288,14 +289,12 @@ bool BoardValidator::ValidateBoard(Board3D& boardToValidate, Logger& mainLogger)
 						}
 					}
 				}
-				boardToValidate.PrintBoard(mainLogger.logFile);
-				mainLogger.logFile << "finished board" << endl;
 			}
 		}
 	}
 
 	// Error Printing
-	if (shapeB) //TODO: print to main logger instead of console
+	if (shapeB) 
 	{
 		GetWrongSizeErrMessage('B', PlayerAID);
 	}
@@ -332,29 +331,37 @@ bool BoardValidator::ValidateBoard(Board3D& boardToValidate, Logger& mainLogger)
 	// Print num of legal ships Errors
 	if (playerAboatNum < LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
 	{
-		cout << TooFewShipsA << endl;
+		MainLogger << TooFewShipsA << endl;
 	}
 	if (playerAboatNum > LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
 	{
-		cout << TooManyShipsA << endl;
+		MainLogger << TooManyShipsA << endl;
 	}
 	if (playerBboatNum < LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
 	{
-		cout << TooFewShipsB << endl;
+		MainLogger << TooFewShipsB << endl;
 	}
 	if (playerBboatNum > LEGAL_NUMBER_OF_SHIPS_PER_PLAYER)
 	{
-		cout << TooManyShipsB << endl;
+		MainLogger << TooManyShipsB << endl;
 	}
 
 	// Print adjacent Error
 	if (adjacentErr)
 	{
-		cout << AdjacentERR << endl;
+		MainLogger << AdjacentERR << endl;
 	}
 
-	bool isNotLegalBoard = shapeB || shapeP || shapeM || shapeD || shapeb || shapep || shapem || shaped
-		|| adjacentErr || playerAboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER || playerBboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER;
-	return isNotLegalBoard;
-}
+	// Checking number of boat
+	bool numBoatsPlayerA = playerAboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER; // true if wrong number
+	if (numBoatsPlayerA)
+		MainLogger << "Number of boats for player A is " << playerAboatNum << " instead of " << LEGAL_NUMBER_OF_SHIPS_PER_PLAYER << endl;
 
+	bool numBoatsPlayerB = playerBboatNum != LEGAL_NUMBER_OF_SHIPS_PER_PLAYER; // true if wrong number
+	if (numBoatsPlayerB)
+		MainLogger << "Number of boats for player B is " << playerBboatNum << " instead of " << LEGAL_NUMBER_OF_SHIPS_PER_PLAYER << endl;
+
+	bool isNotLegalBoard = shapeB || shapeP || shapeM || shapeD || shapeb || shapep || shapem || shaped
+		|| adjacentErr || numBoatsPlayerA || numBoatsPlayerB;
+	return !isNotLegalBoard;
+} 

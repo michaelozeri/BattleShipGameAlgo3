@@ -62,8 +62,8 @@ void GameContoller::RunSingleGame(GameTask& gameTask)
 	bool isExistEmptyQueue = false;
 	GameResultInfo result = gameTask.RunTask();
 
-	PlayerResultElement playerAScore(result.Winner == PlayerAWinner, result.Points_PlayerA, result.Points_PlayerB, gameTask.index1);
-	PlayerResultElement playerBScore(result.Winner == PlayerBWinner, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2);
+	PlayerResultElement playerAScore(result.Winner == PlayerAWinner, result.Winner == PlayerBWinner, result.Points_PlayerA, result.Points_PlayerB, gameTask.index1);
+	PlayerResultElement playerBScore(result.Winner == PlayerBWinner, result.Winner == PlayerAWinner, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2);
 	{
 		lock_guard<mutex>  lg(result_mutex_);
 		results[gameTask.index1].push(playerAScore);
@@ -102,31 +102,55 @@ void GameContoller::ReportManager()
 {
 	Logger ReporterLogger;
 	GameBoardUtils::InitLogger(ReporterLogger, "C:\\temp\\Foo1\\ReporterLoger.log");
+	bool stopThreadExecution = false;
 
-	vector<PlayerResultElement> elementsToHandle;
+	while (!stopThreadExecution)
 	{
-		std::unique_lock<std::mutex> lk(result_mutex_);
-		cv.wait(lk, [this] {return IsReportResolts || IsGameFinished; });
-
-		ReporterLogger << "Starting reporting" << endl;
-		int minElem = MAXINT;
-
-		for each (const queue<PlayerResultElement>& q in results)
+		vector<PlayerResultElement> elementsToHandle;
 		{
-			minElem = static_cast<int>(min(minElem, q.size()));
-		}
-		ReporterLogger << "Min element: " << minElem << endl;
+			std::unique_lock<std::mutex> lk(result_mutex_);
+			cv.wait(lk, [this] {return IsReportResolts || IsGameFinished; });
 
-		for(int i=0; i<results.size(); ++i)
-		{
-			FillElementFromQueue(elementsToHandle, i, minElem);
+			if (IsGameFinished)
+			{
+				ReporterLogger << "Starting reporting - Game finished" << endl;
+
+				for (int i = 0; i < results.size(); ++i)
+				{
+					FillAllElementsFromQueue(elementsToHandle, i);
+				}
+
+				// Stop reporting thread execution in case of end game
+				stopThreadExecution = true;
+			}
+			else
+			{
+				ReporterLogger << "Starting reporting - Game is not finished" << endl;
+				int minElem = MAXINT;
+
+				for each (const queue<PlayerResultElement>& q in results)
+				{
+					minElem = static_cast<int>(min(minElem, q.size()));
+				}
+				ReporterLogger << "Min element: " << minElem << endl;
+
+				for (int i = 0; i < results.size(); ++i)
+				{
+					ReporterLogger << "Queue size before extracting: " << results[i].size() << endl;
+					FillElementFromQueue(elementsToHandle, i, minElem);
+					ReporterLogger << "Queue size after extracting: " << results[i].size() << endl;
+
+				}
+				IsReportResolts = false;
+			}
+
+			lk.unlock();
 		}
-		lk.unlock();
+
+		// Handle updating and reporting
+		ReporterLogger << "Release lock and handling " << elementsToHandle.size() << " elements" << endl;
+		PlayerScoreUtils::UpdatePlayerScores(PlayerScoreInfos, elementsToHandle, ReporterLogger.logFile);
 	}
-
-	// Handle updating and reporting
-	ReporterLogger << "Release lock and handling " << elementsToHandle.size() << " elements" << endl;
-	PlayerScoreUtils::UpdatePlayerScores(PlayerScoreInfos, elementsToHandle);
 }
 
 void GameContoller::FillElementFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId, int elementsToExtract)
@@ -138,6 +162,18 @@ void GameContoller::FillElementFromQueue(vector<PlayerResultElement>& collection
 		if (playerResultQueue.empty())
 			break;
 
+		PlayerResultElement temp = playerResultQueue.front();
+		collectionToFill.push_back(move(temp));
+		playerResultQueue.pop();
+	}
+}
+
+void GameContoller::FillAllElementsFromQueue(vector<PlayerResultElement>& collectionToFill, int playerId)
+{
+	queue<PlayerResultElement>& playerResultQueue = results[playerId];
+
+	while (!playerResultQueue.empty())
+	{
 		PlayerResultElement temp = playerResultQueue.front();
 		collectionToFill.push_back(move(temp));
 		playerResultQueue.pop();

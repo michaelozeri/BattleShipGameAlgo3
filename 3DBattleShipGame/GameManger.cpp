@@ -200,6 +200,8 @@ GameResultInfo GameManager::RunGame()
 
 	GameResultInfo resultInfo = PlayGame();
 
+	GameLogger << "Winner: " << resultInfo.Winner << endl;
+
 	GameLogger.logFile << "Game exit code is " << code << endl;
 	return resultInfo;
 }

@@ -32,8 +32,9 @@ class PlayerScoreUtils
 
 
 public:
-	static void UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement> elementsToUpdate);
+	static void UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement> elementsToUpdate, ostream& out);
 	static void PrintScores(ostream& out, const vector<PlayerScoreInfo>& scores);
 	static void PrintSingleScore(ostream& out, const PlayerScoreInfo& score, int list_index);
+	static double GeneratePrecentageString(const PlayerScoreInfo& score);
 	static void PrintStartLine(ostream& out);
 };

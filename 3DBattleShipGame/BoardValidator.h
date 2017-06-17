@@ -8,5 +8,5 @@ using namespace std;
 class BoardValidator
 {
 public:
-	static bool ValidateBoard(Board3D&  boardToValidate,Logger& mainLogger);
+	static bool ValidateBoard(Board3D  boardToValidate,Logger& mainLogger);
 };
