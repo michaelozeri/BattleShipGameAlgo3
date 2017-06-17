@@ -88,7 +88,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>C:\Users\mzaitler\Desktop\Distribute.bat</Command>
+      <Command>C:\Users\mzaitler\Desktop\DistributeD.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -120,7 +120,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>C:\Users\mzaitler\Desktop\Distribute.bat</Command>
+      <Command>C:\Users\mzaitler\Desktop\DistributeR.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

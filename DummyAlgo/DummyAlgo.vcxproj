@@ -87,7 +87,7 @@
       <AdditionalIncludeDirectories>..\Common</AdditionalIncludeDirectories>
     </ClCompile>
     <PostBuildEvent>
-      <Command>C:\Users\mzaitler\Desktop\Distribute.bat</Command>
+      <Command>C:\Users\mzaitler\Desktop\DistributeD.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,6 +117,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <PostBuildEvent>
+      <Command>C:\Users\mzaitler\Desktop\DistributeR.bat</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DummyAlgo.h" />

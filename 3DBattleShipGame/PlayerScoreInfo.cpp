@@ -2,10 +2,11 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
-PlayerScoreInfo::PlayerScoreInfo(int playerId, std::string name): PlayerId(playerId), GamePlayed(0), Wins(0), Losses(0), PtsFor(0), PtsAgainst(0)
+PlayerScoreInfo::PlayerScoreInfo(int playerId, std::string name): PlayerId(playerId), GamePlayed(0), Wins(0), Losses(0), PtsFor(0), PtsAgainst(0), Percentage(0)
 {
 	// Init player name
 	Name = move(name);
@@ -28,14 +29,28 @@ void PlayerScoreUtils::UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vecto
 
 }
 
-void PlayerScoreUtils::PrintScores(ostream& out, const vector<PlayerScoreInfo>& scores)
+bool myfunction(const PlayerScoreInfo& first, const PlayerScoreInfo& second) { return (first.Percentage > second.Percentage); }
+
+
+void PlayerScoreUtils::PrintScores(ostream& out, vector<PlayerScoreInfo>& scores)
 {
 	PrintStartLine(out);
 	int list_index = 1;
+	CalaculatePercentage(scores);
+	std::sort(scores.begin() , scores.end(), myfunction); // 12 32 45 71(26 33 53 80)
+
 	for each(const PlayerScoreInfo& score in scores)
 	{
 		PrintSingleScore(out, score, list_index);
 		++list_index;
+	}
+}
+
+void PlayerScoreUtils::CalaculatePercentage(vector<PlayerScoreInfo>& scores)
+{
+	for (vector<PlayerScoreInfo>::iterator it = scores.begin(); it != scores.end(); ++it)
+	{
+		(*it).Percentage = GeneratePrecentageString(*it);
 	}
 }
 
@@ -48,8 +63,18 @@ void PlayerScoreUtils::PrintSingleScore(ostream& out, const PlayerScoreInfo& sco
 	out << left << setw(WinsW) << score.Wins;
 	out << left << setw(LossesW) << score.Losses;
 
-	//ToDo - fix that in case of '5' will be printet 5 and not 5.00
-	out << left << setw(PercentageW) << std::setprecision(2) << std::fixed << GeneratePrecentageString(score);
+	int a = static_cast<int>(score.Percentage);
+	if(static_cast<double>(a)==score.Percentage)
+	{
+		out << left << setw(PercentageW) << score.Percentage;
+
+	}
+	else
+	{
+		out << left << setw(PercentageW) << std::setprecision(2) << std::fixed << score.Percentage;
+
+	}
+
 	out << left << setw(PtsForW) << score.PtsFor;
 	out << left << setw(PtsAgainst) << score.PtsAgainst;
 	out << endl;
