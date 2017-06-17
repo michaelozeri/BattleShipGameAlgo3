@@ -52,10 +52,6 @@ void GameContoller::RunSingleThread(int id)
 	MainLogger.SyncPrint(ss);
 }
 
-void GameContoller::PrintGameQueue()
-{
-	// Cannot be implemented
-}
 
 void GameContoller::RunSingleGame(GameTask& gameTask) 
 {

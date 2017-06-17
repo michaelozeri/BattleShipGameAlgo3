@@ -24,7 +24,7 @@ public:
 	
 	SmartBattleshipGameAlgo();
 
-	Coordinate AllignCord(Coordinate currCoor, bool isNegative = false);
+	static Coordinate AllignCord(Coordinate currCoor, bool isNegative = false);
 	//static pair<int, int> AllignCord(const pair<int, int>& pair, bool isNegative = false);
 	
 	Coordinate GetValidRandomAttack();
