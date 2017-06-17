@@ -4,9 +4,9 @@ ShipDetailsBoard::ShipDetailsBoard(Board3D& board3_d, int playerID) : playerID(p
 {
 	for (size_t k = 0; k < mainboard.m_Depth; k++)
 	{
-		for (size_t i = 0; i < ROWS; i++)
+		for (size_t i = 0; i < mainboard.m_Rows; i++)
 		{
-			for (size_t j = 0; j < COLS; j++)
+			for (size_t j = 0; j < mainboard.m_Cols; j++)
 			{
 				char cell = board3_d.m_board[i][j][k];
 				if (_utils.IsPlayerIdChar(playerID, cell))
