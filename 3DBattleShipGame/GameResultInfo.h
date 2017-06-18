@@ -21,9 +21,10 @@ public:
 	int PtsFor;
 	int PtsAgainst;
 	int PlayerId;
+	int game_id;
 
-	PlayerResultElement(bool isWon, bool isLoss, int ptsFor, int ptsAgainst, int player_id) : 
-			IsWon(isWon), IsLoss(isLoss), PtsFor(ptsFor), PtsAgainst(ptsAgainst), PlayerId(player_id)
+	PlayerResultElement(bool isWon, bool isLoss, int ptsFor, int ptsAgainst, int player_id, int gameID) :
+		IsWon(isWon), IsLoss(isLoss), PtsFor(ptsFor), PtsAgainst(ptsAgainst), PlayerId(player_id), game_id(gameID)
 	{
 	}
 };

@@ -88,7 +88,5 @@ int IFileDirectoryUtils::GetAllFiles(const string& basePath, const string& fileP
 	}
 	
 	FindClose(handle);
-
-	sort(collection.begin(), collection.end());
 	return counter;
 }

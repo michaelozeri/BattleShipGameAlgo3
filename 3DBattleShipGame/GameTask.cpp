@@ -14,5 +14,11 @@ GameTask::GameTask(int index1, int index2, Board3D gameBoard, vector<DllAlgo>& f
 GameResultInfo GameTask::RunTask()
 {
 	GameManager game_manager(move(algo1), move(algo2), m_gameBoard, task_id);
-	return game_manager.RunGame();
+	GameResultInfo res =  game_manager.RunGame();
+	if(res.Winner!=NoWinner)
+	{
+		res.Winner = res.Winner == PlayerAWinner ? index1 : index2;
+	}
+	MainLogger << "TaskId: " << task_id << " player_id_Winner: " << res.Winner << endl;
+	return res;
 }

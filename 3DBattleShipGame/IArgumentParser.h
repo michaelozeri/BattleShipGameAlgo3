@@ -12,5 +12,6 @@ public:
 class IArgumentParser
 {
 public :
-	static void ParseArguments(Configuration& config, int argc, char* argv[]);
+	static bool ParseArguments(Configuration& config, int argc, char* argv[]);
+	static string GetValidPath(string argPath);
 };

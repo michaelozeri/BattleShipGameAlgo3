@@ -20,10 +20,13 @@ int main(int argc, char* argv[])
 	//RunTest();
 	//return 0;
 	
-	GameBoardUtils::InitLogger(MainLogger, "C:\\temp\\Foo1\\GameManager.log");
 
 	Configuration config;
-	IArgumentParser::ParseArguments(config, argc, argv);
+	bool result =  IArgumentParser::ParseArguments(config, argc, argv);
+	if (!result)
+		return 0;
+	GameBoardUtils::InitLogger(MainLogger, config.path + "\\GameManager.log");
+
 	GameContoller gameController(config);
 
 	gameController.RunApplication();

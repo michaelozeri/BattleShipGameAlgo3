@@ -12,11 +12,18 @@ PlayerScoreInfo::PlayerScoreInfo(int playerId, std::string name): PlayerId(playe
 	Name = move(name);
 }
 
+
+bool myfunction2(const PlayerScoreInfo& first, const PlayerScoreInfo& second) { return (first.PlayerId < second.PlayerId); }
+
 void PlayerScoreUtils::UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement> elementsToUpdate, ostream& out)
 {
+	std::sort(scores.begin(), scores.end(), myfunction2);
 	for each (const PlayerResultElement& elem in elementsToUpdate)
 	{
+		out << "UpdatePlayerScores: PlayerId: " << elem.PlayerId << " IsWon " << elem.IsWon << " IsLoss " << elem.IsLoss << endl;
 		PlayerScoreInfo& currentPlayer = scores[elem.PlayerId];
+		if (currentPlayer.PlayerId != elem.PlayerId)
+			out << "**********************************Fuck" << endl;
 		currentPlayer.GamePlayed++;
 		currentPlayer.Wins += elem.IsWon ? 1 : 0;
 		currentPlayer.Losses += elem.IsLoss ? 1 : 0;
@@ -37,7 +44,7 @@ void PlayerScoreUtils::PrintScores(ostream& out, vector<PlayerScoreInfo>& scores
 	PrintStartLine(out);
 	int list_index = 1;
 	CalaculatePercentage(scores);
-	std::sort(scores.begin() , scores.end(), myfunction); // 12 32 45 71(26 33 53 80)
+	std::sort(scores.begin() , scores.end(), myfunction); 
 
 	for each(const PlayerScoreInfo& score in scores)
 	{

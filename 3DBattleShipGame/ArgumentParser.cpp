@@ -3,7 +3,7 @@
 
 #define DefaultThreadNum 4
 
-void IArgumentParser::ParseArguments(Configuration& config, int argc, char* argv[])
+bool IArgumentParser::ParseArguments(Configuration& config, int argc, char* argv[])
 {
 	config.thread_num = DefaultThreadNum;
 	config.path = "";
@@ -21,9 +21,40 @@ void IArgumentParser::ParseArguments(Configuration& config, int argc, char* argv
 			else
 			{
 				config.path = argv[i];
-				MainLogger << "IArgumentParser Path: " << config.path << endl;
+				//MainLogger << "IArgumentParser Path: " << config.path << endl;
 			}
 		}
 	}
-	MainLogger << "IArgumentParser: Threads- " << config.thread_num << endl;
+
+	config.path = GetValidPath(config.path);
+	return !config.path.empty();
+	//MainLogger << "IArgumentParser: Threads- " << config.thread_num << endl;
+}
+
+string IArgumentParser::GetValidPath(string argPath)
+{
+	string path;
+	if (!argPath.empty())
+	{
+		//MainLogger.logFile << "Path provided in the argument is " << config.path << endl;
+		path = IFileDirectoryUtils::GetFullPath(argPath);
+		if (IFileDirectoryUtils::DirExists(path))
+		{
+			//MainLogger.logFile << "Full path directory exist: " << config.path << endl;
+			return path;
+		}
+		//MainLogger.logFile << "Path is not exist " << config.path << endl;
+		cout << "Wrong Path: " << path << endl;
+		return "";
+	}
+	//MainLogger.logFile << "Path is not specified in the argument, getting current working directory" << endl;
+	path = IFileDirectoryUtils::GetCurrentWorkingDirectory();
+
+	if (IFileDirectoryUtils::DirExists(path))
+	{
+		//MainLogger.logFile << "Current working directory is " << config.path << endl;
+		return path;
+	}
+	cout << "Wrong Path: " << path << endl;
+	return "";
 }

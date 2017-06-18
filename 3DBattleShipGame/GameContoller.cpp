@@ -45,11 +45,12 @@ void GameContoller::RunSingleThread(int id)
 
 	ss.str(string());
 	tempAT = --active_threads;
-	if (tempAT == 0)
-		IsGameFinished = true;
-
+	
 	ss << currentThreadId << ": Exit. Number  remain active threads " << tempAT << endl;
 	MainLogger.SyncPrint(ss);
+
+	if (tempAT == 0)
+		IsGameFinished = true;	
 }
 
 
@@ -58,10 +59,14 @@ void GameContoller::RunSingleGame(GameTask& gameTask)
 	bool isExistEmptyQueue = false;
 	GameResultInfo result = gameTask.RunTask();
 
-	PlayerResultElement playerAScore(result.Winner == PlayerAWinner, result.Winner == PlayerBWinner, result.Points_PlayerA, result.Points_PlayerB, gameTask.index1);
-	PlayerResultElement playerBScore(result.Winner == PlayerBWinner, result.Winner == PlayerAWinner, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2);
+	PlayerResultElement playerAScore(result.Winner == gameTask.index1, result.Winner == gameTask.index2, result.Points_PlayerA, result.Points_PlayerB, gameTask.index1, gameTask.task_id);
+	PlayerResultElement playerBScore(result.Winner == gameTask.index2, result.Winner == gameTask.index1, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2, gameTask.task_id);
 	{
 		lock_guard<mutex>  lg(result_mutex_); 
+		MainLogger << "Inserting to queue: PlayerId-" << playerAScore.PlayerId << "Is win:" << playerAScore.IsWon << " Is Loss" << playerAScore.IsLoss << endl;
+		MainLogger << "Inserting to queue: PlayerId-" << playerBScore.PlayerId << "Is win:" << playerBScore.IsWon << " Is Loss" << playerBScore.IsLoss << endl;
+
+
 		results[gameTask.index1].push(playerAScore);
 		results[gameTask.index2].push(playerBScore);
 
@@ -107,6 +112,7 @@ void GameContoller::ReportManager()
 			std::unique_lock<std::mutex> lk(result_mutex_);
 			cv.wait(lk, [this] {return IsReportResolts || IsGameFinished; });
 
+			IsReportResolts = false;
 			if (IsGameFinished)
 			{
 				ReporterLogger << "Starting reporting - Game finished" << endl;
@@ -137,15 +143,15 @@ void GameContoller::ReportManager()
 					ReporterLogger << "Queue size after extracting: " << results[i].size() << endl;
 
 				}
-				IsReportResolts = false;
 			}
+			// Handle updating and reporting
+			ReporterLogger << "Release lock and handling " << elementsToHandle.size() << " elements" << endl;
+			PlayerScoreUtils::UpdatePlayerScores(PlayerScoreInfos, elementsToHandle, ReporterLogger.logFile);
 
 			lk.unlock();
 		}
-
-		// Handle updating and reporting
-		ReporterLogger << "Release lock and handling " << elementsToHandle.size() << " elements" << endl;
-		PlayerScoreUtils::UpdatePlayerScores(PlayerScoreInfos, elementsToHandle, ReporterLogger.logFile);
+		
+		
 	}
 }
 
@@ -201,7 +207,7 @@ void GameContoller::RunApplication()
 	}
 
 	thread report_thread(&GameContoller::ReportManager, this);
-	for (auto & t : threads) { 
+	for (thread & t : threads) { 
 		t.join();
 	}
 	report_thread.join();
@@ -250,23 +256,22 @@ bool GameContoller::ConfigureDll()
 		return false;
 	}
 	
-	int index = 0;
-	for each (const string& dll in dll_paths)
+
+	for (int i=0; i<dll_paths.size();++i)
 	{
 		DllAlgo tempAlgo;
-		bool result = tempAlgo.LoadDll(dll, dll_names[index]);
+		bool result = tempAlgo.LoadDll(dll_paths[i], dll_names[i]);
 		if(result)
 		{
 			algos_factory.push_back(move(tempAlgo));
 			results.push_back(queue<PlayerResultElement>());
 
 			// Init player score infos
-			PlayerScoreInfos.push_back(PlayerScoreInfo(index, dll_names[index]));
+			PlayerScoreInfos.push_back(PlayerScoreInfo(i, dll_names[i]));
 		}
-		++index;
 	}
 
-	index = 0;
+	int index = 0;
 	MainLogger << "===== Printing Factories=======" << endl;
 	for each (const DllAlgo& algo in algos_factory)
 	{
@@ -295,6 +300,7 @@ bool GameContoller::ConfigureBoards()
 
 bool GameContoller::GenerateGameQueue()
 {
+	MainLogger << "============== GenerateGameQueue ==============" << endl;
 	int numOfAlgos = static_cast<int>(algos_factory.size());
 	int task_id = 0;
 	for each (const Board3D& gameBoard in board3_ds)
@@ -303,7 +309,9 @@ bool GameContoller::GenerateGameQueue()
 		{
 			for (int j = 0; j < numOfAlgos; j++)
 			{
-				m_taskList.emplace(j, (j + i) % numOfAlgos, gameBoard, algos_factory, task_id);
+				int a = j; int b = (j + i) % numOfAlgos;
+				MainLogger << "Inserting to queue player1-" << a << " player2-" << b << " game_id " << task_id << endl;
+				m_taskList.emplace(a, b, gameBoard, algos_factory, task_id);
 				++task_id;
 			}
 		}
