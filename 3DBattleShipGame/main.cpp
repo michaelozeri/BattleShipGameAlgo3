@@ -1,5 +1,4 @@
 #include "GameBoardUtils.h"
-#include "Bonus.h"
 #include <vector>
 #include "IBattleshipGameAlgo.h"
 #include "IFileDirectoryUtils.h"

@@ -25,48 +25,19 @@ public:
 	SmartBattleshipGameAlgo();
 
 	static Coordinate AllignCord(Coordinate currCoor, bool isNegative = false);
-	//static pair<int, int> AllignCord(const pair<int, int>& pair, bool isNegative = false);
-	
 	Coordinate GetValidRandomAttack();
-	//pair<int, int> GetValidRandomAttack();
-
 	Coordinate GetValidOptionalAttack();
-	//pair<int, int> GetValidOptionalAttack();
-
-
 	void AddSqureCellsToQueue(int row, int col, int depth);
-	//void AddSqureCellsToQueue(int row, int col);
-
 	void AddPotentialAttckIfLegal(int row, int col, int depth, AttackDir dir);
-	//void AddPotentialAttckIfLegal(int row, int col, AttackDir dir);
-
 	void HandleMyRandomMode(int row, int col, int depth, AttackResult result);
-	//void HandleMyRandomMode(int row, int col, AttackResult result);
-
 	void HandleMyTargetMode(int row, int col, int depth, AttackResult result);
-	//void HandleMyTargetMode(int row, int col, AttackResult result);
-	
 	tuple<int, int, int, AttackDir> Dequeue(int row, int col, int depth);
-	//tuple<int, int, AttackDir> Dequeue(int row, int col);
-
 	void AddToQueueAfterHit(int row, int col, int depth);
-	//void AddToQueueAfterHit(int row, int col);
-	
 	void HandleMyAttackResult(int row, int col, int depth, AttackResult result);
-	//void HandleMyAttackResult(int row, int col, AttackResult result);
-
-	//TODO - why const?
 	void HandleRivalAttackResult(int row, int col, int depth, AttackResult result);
-	//void HandleRivalAttackResult(int row, int col, AttackResult result) const;
-
-
-	// TODO - why const? makes problem with lvalue for board3d.m_board...
 	void MarkInvalidCell(int row, int col, int depth, AttackResult result); 
-	//void MarkInvalidCell(int row, int col, AttackResult result) const;
-	
-	//TODO - why const? makes problem with lvalue for board3d.m_board...
 	void MarkSinkBattleAroundAsInvlid(int row, int col, int depth);
-	//void MarkSinkBattleAroundAsInvlid(int row, int col) const;
+	
 	
 
 private:

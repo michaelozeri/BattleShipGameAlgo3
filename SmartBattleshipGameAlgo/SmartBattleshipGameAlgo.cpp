@@ -432,7 +432,7 @@ bool SmartBattleshipGameAlgo::IsAttackValid(int row, int col, int depth) const
 * \return SmartBattleshipGameAlgo initalized object - used for loading DLL
 */
 
-// TODO what is the builder of returns a smartalgo?
+
 // and what is the smart algo builder do
 IBattleshipGameAlgo* GetAlgorithm()
 {
