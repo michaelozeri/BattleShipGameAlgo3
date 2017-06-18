@@ -63,8 +63,10 @@ void GameContoller::RunSingleGame(GameTask& gameTask)
 	PlayerResultElement playerBScore(result.Winner == gameTask.index2, result.Winner == gameTask.index1, result.Points_PlayerB, result.Points_PlayerA, gameTask.index2, gameTask.task_id);
 	{
 		lock_guard<mutex>  lg(result_mutex_); 
-		MainLogger << "Inserting to queue: PlayerId-" << playerAScore.PlayerId << "Is win:" << playerAScore.IsWon << " Is Loss" << playerAScore.IsLoss << endl;
-		MainLogger << "Inserting to queue: PlayerId-" << playerBScore.PlayerId << "Is win:" << playerBScore.IsWon << " Is Loss" << playerBScore.IsLoss << endl;
+		stringstream ss;
+		ss << "Inserting to queue: PlayerId-" << playerAScore.PlayerId << "Is win:" << playerAScore.IsWon << " Is Loss" << playerAScore.IsLoss << endl;
+		ss << "Inserting to queue: PlayerId-" << playerBScore.PlayerId << "Is win:" << playerBScore.IsWon << " Is Loss" << playerBScore.IsLoss << endl;
+		MainLogger.SyncPrint(ss);
 
 
 		results[gameTask.index1].push(playerAScore);

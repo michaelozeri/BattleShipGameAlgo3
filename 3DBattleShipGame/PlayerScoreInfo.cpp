@@ -15,7 +15,7 @@ PlayerScoreInfo::PlayerScoreInfo(int playerId, std::string name): PlayerId(playe
 
 bool myfunction2(const PlayerScoreInfo& first, const PlayerScoreInfo& second) { return (first.PlayerId < second.PlayerId); }
 
-void PlayerScoreUtils::UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement> elementsToUpdate, ostream& out)
+void PlayerScoreUtils::UpdatePlayerScores(vector<PlayerScoreInfo>& scores, vector<PlayerResultElement>& elementsToUpdate, ostream& out)
 {
 	std::sort(scores.begin(), scores.end(), myfunction2);
 	for each (const PlayerResultElement& elem in elementsToUpdate)
