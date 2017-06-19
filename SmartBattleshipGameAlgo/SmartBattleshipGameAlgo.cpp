@@ -28,6 +28,7 @@ Coordinate SmartBattleshipGameAlgo::attack()
 		}
 		return AllignCord(attackCoor);
 	}
+
 	// if we're at Target Mode
 	attackCoor = GetValidOptionalAttack();
 	if(attackCoor.row == AttckDoneIndex)
@@ -45,23 +46,23 @@ Coordinate SmartBattleshipGameAlgo::attack()
 
 Coordinate SmartBattleshipGameAlgo::GetValidRandomAttack ()
 {
-	Coordinate currAttack(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
 	while (m_attacksRemain.size() > 0)
 	{
 		int randomLocation = GetRandom(m_attacksRemain.size());
-		currAttack = m_attacksRemain[randomLocation];
+		Coordinate currAttack = m_attacksRemain[randomLocation];
 
 		if (!IsAttackValid(currAttack.row, currAttack.col, currAttack.depth))
 		{
 			// erase the element from the vector and TODO ::marking it as N on board?
 			m_attacksRemain.erase(m_attacksRemain.begin() + randomLocation);
+			continue;
 		}
 		else
 		{
 			return currAttack;
 		}
 	}
-	return currAttack;
+	return Coordinate(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
 }
 
 Coordinate SmartBattleshipGameAlgo::GetValidOptionalAttack()
@@ -88,10 +89,10 @@ Coordinate SmartBattleshipGameAlgo::GetValidOptionalAttack()
 
 		else
 		{
-			return { get<0>(currentAttack) , get<1>(currentAttack), get<2>(currentAttack) };
+			return Coordinate(get<0>(currentAttack), get<1>(currentAttack), get<2>(currentAttack));
 		}
 	}
-	return{ AttckDoneIndex, AttckDoneIndex, AttckDoneIndex };
+	return Coordinate(AttckDoneIndex, AttckDoneIndex, AttckDoneIndex);
 }
 
 void SmartBattleshipGameAlgo::AddSqureCellsToQueue(int row, int col, int depth)
@@ -121,11 +122,14 @@ void SmartBattleshipGameAlgo::AddSqureCellsToQueue(int row, int col, int depth)
 	}
 
 	// Add depth-1 cell
-	if (depth > 0) {
+	if (depth > 0) 
+	{
 		AddPotentialAttckIfLegal(row, col, depth - 1, AttackDir::depth_dir);
 	}
+
 	// Add depth+1 cell
-	if (depth < m_depth) {
+	if (depth < m_depth - 1)
+	{
 		AddPotentialAttckIfLegal(row, col, depth + 1, AttackDir::depth_dir);
 	}
 }
@@ -166,7 +170,7 @@ void SmartBattleshipGameAlgo::HandleMyRandomMode(int row, int col, int depth, At
 
 tuple<int, int, int, AttackDir> SmartBattleshipGameAlgo::Dequeue(int row, int col, int depth)
 {
-	for (auto itr = m_PotentialAttacks.begin(); itr != m_PotentialAttacks.end(); ++itr)
+	for (vector<tuple<int, int, int, AttackDir>>::iterator itr = m_PotentialAttacks.begin(); itr != m_PotentialAttacks.end(); ++itr)
 	{
 		int y = get<0>(*itr);
 		int x = get<1>(*itr);
@@ -220,7 +224,7 @@ void SmartBattleshipGameAlgo::AddToQueueAfterHit(int row, int col, int depth)
 		}
 
 		// Add depth+1
-		if (depth < m_depth) {
+		if (depth < m_depth - 1) {
 			AddPotentialAttckIfLegal(row, col, depth + 1, AttackDir::depth_dir);
 		}
 	}
@@ -268,9 +272,11 @@ void SmartBattleshipGameAlgo::HandleMyAttackResult(int row, int col, int depth, 
 
 void SmartBattleshipGameAlgo::HandleRivalAttackResult(int row, int col, int depth, AttackResult result)
 {
-	if(result == AttackResult::Miss)
+	if (result == AttackResult::Miss)
 	{
-		m_Board3d.m_board[row][col][depth] = CannotAttck;
+		char c = m_Board3d.m_board[row][col][depth];
+		if (c != CannotAttackShip)
+			m_Board3d.m_board[row][col][depth] = CannotAttck;
 	}
 }
 
@@ -278,7 +284,7 @@ void SmartBattleshipGameAlgo::MarkInvalidCell(int row, int col, int depth, Attac
 {
 	// we mark the value of the char at the board
 	// in the place that WE(!) attacked
-	char markValue;
+	char markValue = CannotAttck;
 	switch (result)
 	{
 	// if we missed, we mark that place with CannotAttack ('N').
@@ -305,7 +311,7 @@ void SmartBattleshipGameAlgo::MarkInvalidCell(int row, int col, int depth, Attac
 void SmartBattleshipGameAlgo::MarkSinkBattleAroundAsInvlid(int row, int col, int depth)
 {
 	// if we're out of bound somehow...
-	if (row < 0 || row >= m_numRows || col < 0 || col >= m_numCols || depth < 0 || depth >= m_depth) {
+	if (row < 0 || row > m_numRows || col < 0 || col > m_numCols || depth < 0 || depth > m_depth) {
 		return;
 	}
 	
@@ -346,6 +352,18 @@ void SmartBattleshipGameAlgo::setBoard(const BoardData& board)
 
 	// creating a Board3D for the smart player, all is BLANK
 	m_Board3d = Board3D(m_numRows, m_numCols, m_depth);
+
+	// Copy board
+	for (int k = 0; k < m_depth; ++k)
+	{
+		for (int i = 0; i < m_numRows; ++i)
+		{
+			for (int j = 0; j < m_numCols; ++j)
+			{
+				m_Board3d.m_board[i][j][k] = board.charAt(Coordinate(i, j, k));
+			}
+		}
+	}
 
 	// mark on m_Board Y if we can strike and N if we can't
 	SmartBoardUtils::MarkCannotAttack(m_myPlayerNum, m_Board3d, m_numRows, m_numCols, m_depth);
@@ -390,7 +408,7 @@ void SmartBattleshipGameAlgo::notifyOnAttackResult(int player, Coordinate move, 
 	{
 		// marking cells according to the result.
 		MarkInvalidCell(currCoor.row, currCoor.col, currCoor.depth, result);
-		// 
+
 		HandleMyAttackResult(currCoor.row, currCoor.col, currCoor.depth, result);
 	}
 	else
@@ -423,6 +441,9 @@ void SmartBattleshipGameAlgo::StartRandomAttackMode()
 // then we return false.
 bool SmartBattleshipGameAlgo::IsAttackValid(int row, int col, int depth) const
 {
+	if (row < 0 || row >= m_numRows || col < 0 || col >= m_numCols || depth < 0 || depth >= m_depth)
+		return false;
+
 	char value = m_Board3d.m_board[row][col][depth];
 	return value != CannotAttck && value != CannotAttackShip;
 }
