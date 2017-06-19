@@ -53,7 +53,7 @@ Coordinate SmartBattleshipGameAlgo::GetValidRandomAttack ()
 
 		if (!IsAttackValid(currAttack.row, currAttack.col, currAttack.depth))
 		{
-			// erase the element from the vector and TODO ::marking it as N on board?
+			// erase the element from the vector
 			m_attacksRemain.erase(m_attacksRemain.begin() + randomLocation);
 			continue;
 		}
